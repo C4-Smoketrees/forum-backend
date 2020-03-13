@@ -27,6 +27,7 @@
     "mongoose": "^5.9.4"
   },
   "devDependencies": {
+    "mocha": "^7.1.0",
     "nodemon": "^2.0.2"
   }
 }
