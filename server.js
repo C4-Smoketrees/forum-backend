@@ -1,6 +1,6 @@
 const express = require("express");
 
-const compression = require("compression")
+const compression = require("compression");
 const sanitizer = require("express-sanitizer");
 const parser = require("body-parser");
 
