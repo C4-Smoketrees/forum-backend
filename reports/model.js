@@ -1,11 +1,8 @@
-const mongoose = require('mongoose')
+class Reports {
+  constructor (object) {
+    this.userId = object.userId
+    this.reportReasons = object.reportReasons
+  }
+}
 
-const Schema = mongoose.Schema
-const objectId = mongoose.ObjectId
-
-const ReportSchema = new Schema({
-  userId: { type: objectId },
-  reportReasons: { type: Number }
-}, { _id: false })
-
-module.exports = mongoose.model('Report', ReportSchema)
+module.exports = Reports

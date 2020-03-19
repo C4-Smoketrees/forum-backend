@@ -1,23 +1,15 @@
-const mongoose = require('mongoose')
+class Thread {
+  constructor (object) {
+    this._id = object._id
+    this.content = object.content
+    this.replies = object.replies
+    this.reports = object.reports
+    this.dateTime = object.dateTime
+    this.upvotes = object.upvotes
+    this.downvotes = object.downvotes
+    this.author = object.author
+    this.stars = object.stars
+  }
+}
 
-const Schema = mongoose.Schema
-const objectId = Schema.ObjectId
-
-// Embedded Documents
-const Reply = require('../replies/model')
-const Report = require('../reports/model')
-
-const ThreadSchema = new Schema({
-  title: { type: String },
-  content: { type: String },
-  tags: { type: [String] },
-  replies: { type: [Reply] },
-  reports: { type: [Report] },
-  dateTime: { type: Date },
-  upvotes: { type: [objectId] }, // userIds
-  downvotes: { type: [objectId] }, // userIds
-  author: { type: objectId }, // userId
-  stars: { type: [objectId] } // userIds
-})
-
-module.exports = mongoose.model('Thread', ThreadSchema)
+module.exports = Thread

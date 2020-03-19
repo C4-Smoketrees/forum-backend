@@ -21,11 +21,14 @@
   "dependencies": {
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
+    "bson": "^4.0.3",
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "express-sanitizer": "^1.0.5",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.9.4"
+    "mongodb": "^3.5.5",
+    "morgan": "^1.9.1",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "mocha": "^7.1.0",
