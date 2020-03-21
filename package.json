@@ -31,8 +31,10 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "mocha": "^7.1.0",
     "nodemon": "^2.0.2",
+    "sleep": "^6.1.0",
     "standard": "^14.3.1"
   }
 }
