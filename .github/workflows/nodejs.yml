@@ -24,8 +24,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: MongoDB
+      uses: supercharge/mongodb-github-action@1.1.0
+      
     - run: npm ci
     - run: npm run lint
-#    - run: npm test  #no test files yet
+    - run: npm run mocha
+#   - run: npm test  #no test files yet
       env:
         CI: true
