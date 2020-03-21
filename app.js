@@ -29,6 +29,6 @@ app.use(compression())
 app.use(morgan)
 
 // Define routes
-app.use('/thread', require('./threads/routes'))
+app.use('/thread', require('./modules/threads/routes'))
 
 module.exports = app
