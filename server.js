@@ -1,38 +1,20 @@
-const app = require('express')()
-const MongoClient = require('mongodb').MongoClient
+const app = require('./app')
+const https = require('https')
+const fs = require('fs')
+const path = require('path')
+const logger = require('./logging/logger')
 
-const compression = require('compression')
-const sanitizer = require('express-sanitizer')
-const parser = require('body-parser')
-const morgan = require('./logging/morgan')
+const PORT = process.env.PORT || 8443
 
-// Connect to the database
-const dbConnectionString = 'mongodb://localhost:27017' || process.env.DB_CONN_STRING
-const dbConn = async () => {
-  try {
-    const dbPromise = MongoClient.connect(dbConnectionString, { useUnifiedTopology: true })
-    app.locals.dbClient = await dbPromise
-  } catch (e) {
-    console.log(e)
-    process.exit(2)
-  }
+const httpsOptions = {
+  key: fs.readFileSync(path.join(__dirname, 'certs', 'forum-backend-key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'certs', 'forum-backend-cert.pem')),
+  ca: [fs.readFileSync(path.join(__dirname, 'certs', 'CA-cert.pem'))],
+  requestCert: true
 }
-dbConn().then(() => {})
 
-// Middlewares
-app.use(sanitizer())
-app.use(parser.json())
-app.use(compression())
+const server = https.createServer(httpsOptions, app)
 
-// Logging
-app.use(morgan)
-
-// Define routes
-app.use('/thread', require('./threads/routes'))
-
-// Get the assigned environment port
-const port = process.env.PORT || 5000
-
-app.listen(port, () => {
-  console.info(`running the forum server on ${port}`)
+server.listen(PORT, () => {
+  logger.info(`started server on port ${PORT}`)
 })

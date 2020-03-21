@@ -106,3 +106,6 @@ dist
 
 # IDE configs
 .idea/
+
+# SSL Certificates
+certs/
