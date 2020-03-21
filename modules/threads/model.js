@@ -3,23 +3,37 @@ const app = require('../../app')
 const logger = require('../../logging/logger')
 
 /**
- * @typedef {{status:boolean,id:string|undefined}} dbResponse
- * @typedef {function(dbResponse)} DatabaseRequestCallback
+ * @typedef {{status:boolean,id:string|undefined}} DatabaseWriteResponse
+ * @typedef {{status:boolean,thread:Thread|undefined}} DatabaseReadResponse
  */
 
+/**
+ * @callback DatabaseWriteRequestCallback
+ * @param {DatabaseWriteResponse} res
+ */
+
+/**
+ * @callback DatabaseReadRequestCallback
+ * @param {DatabaseReadResponse} res Result for database Request
+ */
+
+/**
+ * Class representing a thread
+ */
 class Thread {
   /**
    * Create an instance of thread
-   * @param {Thread} thread Object representing the Thread
-   * @param {bson.ObjectID} [thread._id] Id for the object
+   * @param {{author: ObjectId, content: string}} thread Object representing the Thread
+   * @param {Thread} thread Object representing a thread
+   * @param {bson.ObjectID=auto_generate} [thread._id] Id for the object
    * @param {string} thread.content Content for the Thread
-   * @param {array(Replies)} [thread.replies] Replies array contains Replies
-   * @param {array(Reports)} [thread.reports] Reports array contains Reports
-   * @param {number} [thread.dateTime] Datetime
-   * @param {array(bson.ObjectID)} [thread.upvotes] Upvotes array
-   * @param {array(bson.ObjectID)} [thread.downvotes] Downvotes array
+   * @param {array(Replies)=[]} [thread.replies] Replies array contains Replies
+   * @param {array(Reports)=[]} [thread.reports] Reports array contains Reports
+   * @param {number=time.now()} [thread.dateTime] Datetime
+   * @param {array(bson.ObjectID)=[]} [thread.upvotes] Upvotes array
+   * @param {array(bson.ObjectID)=[]} [thread.downvotes] Downvotes array
    * @param {bson.ObjectID} thread.author Author of the thread
-   * @param {number} [thread.stars] Stars for the post
+   * @param {number=0} [thread.stars] Stars for the post
    */
   constructor (thread) {
     this._id = thread._id
@@ -34,17 +48,12 @@ class Thread {
   }
 
   /**
-   * @callback DataRequestCallback
-   * @param {dbResponse} res
-   */
-
-  /**
    * Creates a new thread in database
-   * @param {DatabaseRequestCallback} fn
+   * @param {DatabaseWriteRequestCallback} fn
    */
   newThread (fn) {
     try {
-      const threadCollection = app.locals.dbClient.db('forum').collection('threads')
+      const threadCollection = app.locals.threadCollection
       // reference for thread is this
       this._id = new bson.ObjectID(bson.ObjectID.generate())
       this.replies = []
@@ -72,10 +81,10 @@ class Thread {
 
   /**
    * Update ThreadContent using threadId
-   * @param {DatabaseRequestCallback} fn
+   * @param {DatabaseWriteRequestCallback} fn
    */
   updateThreadContentUsingId (fn) {
-    const threadCollection = app.locals.dbClient.db('forum').collection('threads')
+    const threadCollection = app.locals.threadCollection
 
     const filter = { _id: this._id }
     const query = { $set: { content: this.content } }
@@ -94,6 +103,30 @@ class Thread {
       logger.error(`Error in updating thread for id: ${response.id}`)
       fn(response)
     })
+  }
+
+  /**
+   * Read and return a thread using id
+   * @param {string} id HexString representing id of the thread
+   * @param {DatabaseReadRequestCallback} fn
+   */
+  static readThreadUsingId (id, fn) {
+    const threadCollection = app.locals.threadCollection
+    const objectId = bson.ObjectID.createFromHexString(id)
+    const filter = { _id: objectId }
+    const func = async () => {
+      try {
+        const dbRes = threadCollection.findOne(filter)
+        const res = { status: true, thread: await dbRes }
+        logger.debug(`Read thread with id: ${res.thread._id.toHexString()}`)
+        fn(res)
+      } catch (e) {
+        const res = { status: false }
+        logger.error(JSON.stringify({ msg: `Error in reading the document with id : ${id}`, err: e }))
+        fn(res)
+      }
+    }
+    func().then(() => {})
   }
 }
 
