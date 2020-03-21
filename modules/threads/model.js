@@ -2,6 +2,11 @@ const bson = require('bson')
 const app = require('../../app')
 const logger = require('../../logging/logger')
 
+/**
+ * @typedef {{status:boolean,id:string|undefined}} dbResponse
+ * @typedef {function(dbResponse)} DatabaseRequestCallback
+ */
+
 class Thread {
   /**
    * Create an instance of thread
@@ -28,6 +33,15 @@ class Thread {
     this.stars = thread.stars
   }
 
+  /**
+   * @callback DataRequestCallback
+   * @param {dbResponse} res
+   */
+
+  /**
+   * Creates a new thread in database
+   * @param {DatabaseRequestCallback} fn
+   */
   newThread (fn) {
     try {
       const threadCollection = app.locals.dbClient.db('forum').collection('threads')
@@ -55,6 +69,30 @@ class Thread {
     } catch (e) {
       logger.error('Error in creating new thread ', e)
     }
+  }
+
+  /**
+   * Update ThreadContent using threadId
+   * @param {DatabaseRequestCallback} fn
+   */
+  updateThread (fn) {
+    const threadCollection = app.locals.dbClient.db('forum').collection('threads')
+
+    const filter = { _id: this._id }
+    const query = { $set: { content: this.content } }
+
+    threadCollection.updateOne(filter, query, {}).then(() => {
+      const response = {
+        status: true,
+        id: this._id.toHexString()
+      }
+      fn(response)
+    }, () => {
+      const response = {
+        status: false
+      }
+      fn(response)
+    })
   }
 }
 
