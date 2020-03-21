@@ -12,15 +12,35 @@ describe('# Threads test-suite', function () {
     await app.locals.dbClient
   })
   describe('# Crud Operations', async function () {
-    describe(' Create ', function () {
-      it('create a new thread', function (done) {
-        const thread = new Thread({ content: 'test content', author: new bson.ObjectID(bson.ObjectID.generate()) })
-        thread.newThread(function (res) {
-          if (res.status) done()
-          else done(res.status)
-        })
+    // Create a thread
+    it('create a new thread', function (done) {
+      const thread = new Thread({ content: 'test content', author: new bson.ObjectID(bson.ObjectID.generate()) })
+      thread.newThread(function (res) {
+        if (!res.status) {
+          done(res.status)
+        } else {
+          done()
+        }
       })
     })
-    //
+    // Create and update the thread
+    it('update a thread', function (done) {
+      const thread = new Thread({ content: 'test content', author: new bson.ObjectID(bson.ObjectID.generate()) })
+      thread.newThread(function (res) {
+        if (!res.status) {
+          done(res.status)
+        } else {
+          thread.content = 'update content'
+          thread.updateThreadContentUsingId(function (res) {
+            if (!res.status) {
+              done(res.status)
+            } else {
+              done()
+            }
+          })
+        }
+      })
+    })
   })
+  //
 })

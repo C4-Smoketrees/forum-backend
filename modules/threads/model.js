@@ -47,7 +47,6 @@ class Thread {
       const threadCollection = app.locals.dbClient.db('forum').collection('threads')
       // reference for thread is this
       this._id = new bson.ObjectID(bson.ObjectID.generate())
-      console.log(this._id.toHexString())
       this.replies = []
       this.reports = []
       this.dateTime = Date.now()
@@ -58,9 +57,9 @@ class Thread {
       threadCollection.insertOne(this).then(() => {
         response = {
           status: true,
-          id: this._id
+          id: this._id.toHexString()
         }
-        logger.debug(`Insert new thread with id:${response.id.toHexString()}`)
+        logger.debug(`Insert new thread with id:${response.id}`)
         fn(response)
       }, () => {
         response = { status: false }
@@ -75,7 +74,7 @@ class Thread {
    * Update ThreadContent using threadId
    * @param {DatabaseRequestCallback} fn
    */
-  updateThread (fn) {
+  updateThreadContentUsingId (fn) {
     const threadCollection = app.locals.dbClient.db('forum').collection('threads')
 
     const filter = { _id: this._id }
@@ -86,11 +85,13 @@ class Thread {
         status: true,
         id: this._id.toHexString()
       }
+      logger.debug(`Updated content for thread for id: ${response.id}`)
       fn(response)
-    }, () => {
+    }, (e) => {
       const response = {
         status: false
       }
+      logger.error(`Error in updating thread for id: ${response.id}`)
       fn(response)
     })
   }
