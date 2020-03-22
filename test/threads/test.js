@@ -13,22 +13,28 @@ describe('# Threads test-suite', function () {
     await app.locals.dbClient
     await app.locals.threadCollection.drop()
   })
-  describe('# Crud Operations', async function () {
+  describe('# Crud Operations', async function (id, fn) {
     // Create a thread
-    it('create a new thread', function (done) {
+    it('Fail a new thread operation', function (done) {
       const thread = new Thread({ content: 'test content', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      thread.newThread(function (res) {
-        if (!res.status) {
-          done(res.status)
+      thread.createThread(function (res) {
+        if (res.status) {
+          thread.createThread(function (res) {
+            if (res.status) {
+              done()
+            } else {
+              done(res.status)
+            }
+          })
         } else {
-          done()
+          done(res.status)
         }
       })
     })
     // Create and update the thread
-    it('update a thread', function (done) {
+    it('create and update a thread', function (done) {
       const thread = new Thread({ content: 'test content', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      thread.newThread(function (res) {
+      thread.createThread(function (res) {
         if (!res.status) {
           done(res.status)
         } else {
@@ -43,10 +49,10 @@ describe('# Threads test-suite', function () {
         }
       })
     })
-    // Create and update the thread
+    // Create and read the thread
     it('read a thread', function (done) {
       const thread = new Thread({ content: 'read content', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      thread.newThread(function (res) {
+      thread.createThread(function (res) {
         if (!res.status) {
           done(res.status)
         } else {
@@ -61,7 +67,16 @@ describe('# Threads test-suite', function () {
           })
         }
       })
+      const thread2 = new Thread({ content: 'read content', author: new bson.ObjectID(bson.ObjectID.generate()) })
+      thread2.createThread(async function (res) {
+        if (!res.status) {
+          done(res.status)
+        } else {
+          const insertId = res.id
+          const res1 = await Thread.readThreadUsingId(res.id, fn)
+          assert.equal(res1.thread._id.toHexString(), insertId)
+        }
+      })
     })
   })
-  //
 })
