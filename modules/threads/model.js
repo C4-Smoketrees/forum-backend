@@ -8,16 +8,6 @@ const logger = require('../../logging/logger')
  */
 
 /**
- * @callback DatabaseWriteRequestCallback
- * @param {DatabaseWriteResponse} res
- */
-
-/**
- * @callback DatabaseReadRequestCallback
- * @param {DatabaseReadResponse} res Result for database Request
- */
-
-/**
  * Class representing a thread
  */
 class Thread {
@@ -49,10 +39,9 @@ class Thread {
 
   /**
    * Creates a new thread in database
-   * @param {DatabaseWriteRequestCallback} fn
-   * @returns {Promise} returns a promise if no callback provided
+   * @returns {Promise} returns a promise
    */
-  createThread (fn) {
+  createThread () {
     const func = async () => {
       try {
         const threadCollection = app.locals.threadCollection
@@ -70,34 +59,21 @@ class Thread {
           id: this._id.toHexString()
         }
         logger.debug(`Insert new thread with id:${response.id}`)
-        if (fn) {
-          fn(response)
-        } else {
-          return response
-        }
+        return response
       } catch (e) {
-        const response = {
-          status: false,
-          id: this._id.toHexString(),
-          err: e
-        }
+        const response = { status: false, err: e }
         logger.debug(`Insert new thread with id:${response.id}`)
-        if (fn) {
-          fn(response)
-        } else {
-          return response
-        }
+        return response
       }
     }
     return func()
   }
 
   /**
-   * Update ThreadContent using threadId
-   * @param {DatabaseWriteRequestCallback} fn
+   * Update ThreadContent using _id property of the thread object
    * @returns {Promise} A promise that always resolves
    */
-  updateThreadContentUsingId (fn) {
+  updateThreadContent () {
     const threadCollection = app.locals.threadCollection
 
     const filter = { _id: this._id }
@@ -105,27 +81,23 @@ class Thread {
 
     const func = async () => {
       try {
-        await threadCollection.updateOne(filter, query, {})
-        const response = {
-          status: true,
-          id: this._id.toHexString()
-        }
-        logger.debug(`Updated content for thread for id: ${response.id}`)
-        if (fn) {
-          fn(response)
+        const res = await threadCollection.updateOne(filter, query, {})
+        let response
+        if (res.modifiedCount === 1) {
+          response = {
+            status: true,
+            id: this._id.toHexString()
+          }
+          logger.debug(`Updated content for thread for id: ${response.id}`)
         } else {
-          return response
+          response = { status: false, id: this._id.toHexString() }
+          logger.error(JSON.stringify({ id: this._id.toHexString(), matches: res.matchedCount }))
         }
+        return response
       } catch (e) {
-        const response = {
-          status: false
-        }
+        const response = { status: false }
         logger.error(`Error in updating thread for id: ${response.id}`)
-        if (fn) {
-          fn(response)
-        } else {
-          return response
-        }
+        return response
       }
     }
     return func()
@@ -134,47 +106,56 @@ class Thread {
   /**
    * Read and return a thread using id
    * @param {string} id HexString representing id of the thread
-   * @param {DatabaseReadRequestCallback} fn
-   * @returns {Promise} If no callback provided. Promise always resolves
+   * @returns {Promise}  Promise always resolves
    */
-  static readThreadUsingId (id, fn) {
+  static readThreadUsingId (id) {
     const threadCollection = app.locals.threadCollection
     const objectId = bson.ObjectID.createFromHexString(id)
     const filter = { _id: objectId }
+
     const func = async () => {
       try {
         const dbRes = await threadCollection.findOne(filter)
         const res = { status: true, thread: await dbRes }
         logger.debug(`Read thread with id: ${res.thread._id.toHexString()}`)
-        if (fn) {
-          fn(res)
-        } else {
-          return res
-        }
+        return res
       } catch (e) {
         const res = { status: false }
         logger.error(JSON.stringify({ msg: `Error in reading the document with id : ${id}`, err: e }))
-        fn(res)
+        return res
       }
     }
     return func()
   }
 
-///**
-// * Delete a thread from the id
-// * @param {string} id  HexString representing id of the thread
-// * @param fn Callback function
-// */
-//static deleteThreadUsingId (id, fn) {
-//  const threadCollection = app.locals.threadCollection
-//  const objectId = bson.ObjectID.createFromHexString(id)
-//  const filter = { _id: objectId }
-//  const func = async () => {
-//    try {
-//      const dbRes = await threadCollection.findOneAndRemove(filter)
-//    }
-//  }
-//}
+  /**
+   * Delete a thread from the id
+   * @param {string} id  HexString representing id of the thread
+   * @returns {Promise} Always resolves
+   */
+  static deleteThreadUsingId (id) {
+    const threadCollection = app.locals.threadCollection
+    const objectId = bson.ObjectID.createFromHexString(id)
+    const filter = { _id: objectId }
+    const func = async () => {
+      try {
+        const res = await threadCollection.deleteOne(filter)
+        let response
+        if (res.deletedCount === 1) {
+          response = { status: true, id: id }
+          logger.debug(`Deleted thread id: ${id}`)
+        } else {
+          response = { status: false }
+        }
+        return response
+      } catch (e) {
+        const response = { status: false, err: e }
+        logger.error(JSON.stringify({ msg: `Error in deleting the document with id : ${id}`, err: e }))
+        return response
+      }
+    }
+    return func()
+  }
 }
 
 module.exports = Thread

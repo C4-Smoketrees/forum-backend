@@ -37,5 +37,14 @@
     "nodemon": "^2.0.2",
     "sleep": "^6.1.0",
     "standard": "^14.3.1"
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "modules/**"
+    ],
+    "exclude": [
+      "modules/**/routes.js"
+    ]
   }
 }
