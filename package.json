@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "lint": "standard",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "mocha": "mocha ./test/*"
+    "test": "mocha ./test/*",
+    "coverage": "nyc mocha ./test/*"
   },
   "repository": {
     "type": "git",

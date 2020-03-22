@@ -1,5 +1,5 @@
 const { assert } = require('chai')
-const { describe, before, it, after } = require('mocha')
+const { describe, beforeEach, it, after } = require('mocha')
 const app = require('../../app')
 const Thread = require('../../modules/threads/model')
 const bson = require('bson')
@@ -9,7 +9,7 @@ after(async function () {
 })
 
 describe('# Threads test-suite', function () {
-  before(async function () {
+  beforeEach(async function () {
     await app.locals.dbClient
     await app.locals.threadCollection.drop()
   })
