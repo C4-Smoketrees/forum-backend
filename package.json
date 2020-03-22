@@ -29,11 +29,12 @@
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
     "morgan": "^1.9.1",
+    "nyc": "^15.0.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^7.1.0",
+    "mocha": "^7.1.1",
     "nodemon": "^2.0.2",
     "sleep": "^6.1.0",
     "standard": "^14.3.1"
