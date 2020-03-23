@@ -1,7 +1,7 @@
 const { assert } = require('chai')
 const { describe, beforeEach, it, after } = require('mocha')
-const app = require('../../app')
-const Thread = require('../../modules/threads/model')
+const app = require('../app')
+const Thread = require('../modules/threads/model')
 const bson = require('bson')
 
 after(async function () {
