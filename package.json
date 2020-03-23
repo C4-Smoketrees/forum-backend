@@ -7,7 +7,8 @@
     "dev": "nodemon server.js",
     "lint": "standard",
     "test": "mocha ./test/*",
-    "coverage": "nyc mocha ./test/*"
+    "coverage": "nyc mocha ./test/*",
+    "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "repository": {
     "type": "git",
