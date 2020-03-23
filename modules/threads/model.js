@@ -150,10 +150,52 @@ class Thread {
         return response
       } catch (e) {
         const response = { status: false, err: e }
-        logger.error(JSON.stringify({ msg: `Error in deleting the document with id : ${id}`, err: e }))
+        logger.error(JSON.stringify({ msg: `Error in deleting the document of id : ${id}`, err: e }))
         return response
       }
     }
+    return func()
+  }
+
+  /**
+   * Increment or Decrement stars of the thread
+   * @param {string} id HexString representing the id
+   * @param {string}command Either inc or dec
+   * @returns {Promise<DatabaseWriteResponse>} Promise always resolves
+   */
+  static updateStars (id, command) {
+    const threadCollection = app.locals.threadCollection
+    const objectId = new bson.ObjectID(bson.ObjectID.createFromHexString(id))
+
+    const filter = { _id: objectId }
+    let query
+    if (command === 'inc') {
+      query = { $inc: { stars: 1 } }
+    } else if (command === 'dec') {
+      query = { $inc: { stars: -1 } }
+    } else {
+      throw new Error('Illegal Command')
+    }
+
+    const func = async () => {
+      try {
+        const result = await threadCollection.updateOne(filter, query)
+        let response
+        if (result.modifiedCount === 1) {
+          response = { status: true, id: id }
+          logger.debug(`Incremented star for the id: ${id}`)
+        } else {
+          response = { status: false, id: id }
+          logger.warn(`Error in incrementing star for id: ${id} modified:${result.modifiedCount} match: ${result.matchedCount}`)
+        }
+        return response
+      } catch (e) {
+        const response = { status: false, err: e }
+        logger.error(JSON.stringify({ msg: `Error in incrementing start for id : ${id}`, err: e }))
+        return response
+      }
+    }
+
     return func()
   }
 }
