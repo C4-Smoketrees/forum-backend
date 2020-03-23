@@ -1,5 +1,4 @@
 const bson = require('bson')
-const app = require('../../app')
 const logger = require('../../logging/logger')
 
 /**
@@ -39,12 +38,12 @@ class Thread {
 
   /**
    * Creates a new thread in database
+   * @param {Collection} threadCollection
    * @returns {Promise} returns a promise
    */
-  createThread () {
+  createThread (threadCollection) {
     const func = async () => {
       try {
-        const threadCollection = app.locals.threadCollection
         // reference for thread is this
         this._id = new bson.ObjectID(bson.ObjectID.generate())
         this.replies = []
@@ -71,11 +70,10 @@ class Thread {
 
   /**
    * Update ThreadContent using _id property of the thread object
+   * @param {Collection} threadCollection
    * @returns {Promise} A promise that always resolves
    */
-  updateThreadContent () {
-    const threadCollection = app.locals.threadCollection
-
+  updateThreadContent (threadCollection) {
     const filter = { _id: this._id }
     const query = { $set: { content: this.content } }
 
@@ -106,10 +104,10 @@ class Thread {
   /**
    * Read and return a thread using id
    * @param {string} id HexString representing id of the thread
+   * @param {Collection} threadCollection
    * @returns {Promise}  Promise always resolves
    */
-  static readThreadUsingId (id) {
-    const threadCollection = app.locals.threadCollection
+  static readThreadUsingId (id, threadCollection) {
     const objectId = bson.ObjectID.createFromHexString(id)
     const filter = { _id: objectId }
 
@@ -131,10 +129,10 @@ class Thread {
   /**
    * Delete a thread from the id
    * @param {string} id  HexString representing id of the thread
+   * @param {Collection} threadCollection
    * @returns {Promise} Always resolves
    */
-  static deleteThreadUsingId (id) {
-    const threadCollection = app.locals.threadCollection
+  static deleteThreadUsingId (id, threadCollection) {
     const objectId = bson.ObjectID.createFromHexString(id)
     const filter = { _id: objectId }
     const func = async () => {
@@ -160,11 +158,11 @@ class Thread {
   /**
    * Increment or Decrement stars of the thread
    * @param {string} id HexString representing the id
-   * @param {string}command Either inc or dec
+   * @param {string} command Either inc or dec
+   * @param {Collection} threadCollection
    * @returns {Promise<DatabaseWriteResponse>} Promise always resolves
    */
-  static updateStars (id, command) {
-    const threadCollection = app.locals.threadCollection
+  static updateStars (id, command, threadCollection) {
     const objectId = new bson.ObjectID(bson.ObjectID.createFromHexString(id))
 
     const filter = { _id: objectId }
