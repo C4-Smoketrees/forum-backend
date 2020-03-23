@@ -29,11 +29,18 @@ jobs:
         uses: supercharge/mongodb-github-action@1.1.0
         with:
           mongodb-version: ${{ matrix.mongodb-version }}
-
+      
       - run: npm ci
       - run: npm install codecov
       - run: npm run lint
       - run: npm run coverage
       - run: npm run codecov
-        env:
-          CI: true
+        
+      - name: Codecov
+        uses: codecov/codecov-action@v1.0.6
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: ./coverage.lcov
+    
+    env:
+      CI: true
