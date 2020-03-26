@@ -1,5 +1,5 @@
 const { assert } = require('chai')
-const { describe, beforeEach, it, after } = require('mocha')
+const { describe, before, it, after } = require('mocha')
 const app = require('../app')
 const Thread = require('../modules/threads/model')
 const bson = require('bson')
@@ -7,15 +7,15 @@ const bson = require('bson')
 after(async function () {
   await app.locals.dbClient.close()
 })
-
+before(async function () {
+  await app.locals.dbClient
+  try {
+    await app.locals.threadCollection.drop()
+  } catch (e) {
+  }
+})
 describe('# Threads test-suite', function () {
-  beforeEach(async function () {
-    await app.locals.dbClient
-    try {
-      await app.locals.threadCollection.drop()
-    } catch (e) {
-    }
-  })
+
   describe('# Crud Operations', function () {
     // Create a new thread and update it
     it('Create a new thread and update it', async function () {

@@ -23,6 +23,7 @@ class Thread {
    * @param {array(bson.ObjectID)=[]} [thread.downvotes] Downvotes array
    * @param {bson.ObjectID} thread.author Author of the thread
    * @param {number=0} [thread.stars] Stars for the post
+   * @param {number=time.now()} thread.astUpdate Last updated
    */
   constructor (thread) {
     this._id = thread._id
@@ -34,6 +35,7 @@ class Thread {
     this.downvotes = thread.downvotes
     this.author = thread.author
     this.stars = thread.stars
+    this.lastUpdate = thread.lastUpdate
   }
 
   /**
@@ -52,6 +54,7 @@ class Thread {
         this.upvotes = []
         this.downvotes = []
         this.stars = 0
+        this.lastUpdate = Date.now()
         await threadCollection.insertOne(this)
         const response = {
           status: true,
@@ -75,7 +78,7 @@ class Thread {
    */
   updateThreadContent (threadCollection) {
     const filter = { _id: this._id }
-    const query = { $set: { content: this.content } }
+    const query = { $set: { content: this.content, lastUpdate: Date.now() } }
 
     const func = async () => {
       try {
