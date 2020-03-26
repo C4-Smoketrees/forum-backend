@@ -5,31 +5,31 @@ class Reply {
   constructor (object) {
     this._id = object._id
     this.content = object.content
-    this.content = object.author
+    this.author = object.author
     this.upvotes = object.upvotes
     this.downvotes = object.downvotes
     this.dateTime = object.dateTime
     this.reports = object.reports
   }
 
-  async newReply (threadId, threadCollection) {
+  async createReply (threadId, threadCollection) {
     let response
     try {
       const filter = {
         _id: bson.ObjectID.createFromHexString(threadId)
       }
-      this._id = bson.ObjectId.generate()
+      this._id = new bson.ObjectID(bson.ObjectId.generate())
       this.dateTime = Date.now()
       const query = {
         $push: {
           replies: this
         }
       }
-      const res = await threadCollection.update(filter, query)
+      const res = await threadCollection.updateOne(filter, query)
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to create a reply for thread:${threadId} replyId:${this._id}`,
+          msg: `Unable to create a reply for thread:${threadId} replyId:${this._id}`
         }
         logger.debug(response.msg)
       } else {

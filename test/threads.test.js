@@ -15,7 +15,6 @@ before(async function () {
   }
 })
 describe('# Threads test-suite', function () {
-
   describe('# Crud Operations', function () {
     // Create a new thread and update it
     it('Create a new thread and update it', async function () {
