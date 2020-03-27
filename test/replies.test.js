@@ -49,5 +49,20 @@ describe('# Replies test-suite', function () {
       const res5 = await reply2.updateReplyContent(thread._id.toHexString(), app.locals.threadCollection)
       assert.isFalse(res5.status)
     })
+    it('delete a Reply', async function () {
+      const thread = new Thread({ content: 'delete thread', author: new bson.ObjectID(bson.ObjectID.generate()) })
+      const res1 = await thread.createThread(app.locals.threadCollection)
+      assert.isTrue(res1.status)
+
+      const reply1 = new Reply({ content: 'reply 1', author: new bson.ObjectID(bson.ObjectID.generate()) })
+      const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+      assert.isTrue(res2.status)
+
+      const res3 = await Reply.deleteReply(thread._id.toHexString(), reply1._id.toHexString(), app.locals.threadCollection)
+      assert.isTrue(res3.status)
+
+      const res4 = await Reply.deleteReply(thread._id.toHexString(), reply1._id.toHexString(), app.locals.threadCollection)
+      assert.isFalse(res4.status)
+    })
   })
 })

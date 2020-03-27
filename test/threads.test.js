@@ -103,7 +103,7 @@ describe('# Threads test-suite', function () {
         const res4 = await Thread.RemoveUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
         assert.isTrue(res4.status)
         const res6 = await Thread.RemoveUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
-        assert.isTrue(res6.status)
+        assert.isFalse(res6.status)
         const res5 = await Thread.AddUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
         assert.isTrue(res5.status)
       } catch (e) {

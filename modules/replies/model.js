@@ -90,9 +90,37 @@ class Reply {
   }
 
   static async deleteReply (threadId, replyId, threadCollection) {
-  }
-
-  static async readReplies (threadId, threadCollection) {
+    let response
+    try {
+      const filter = {
+        _id: bson.ObjectID.createFromHexString(threadId)
+      }
+      const query = {
+        $pull: { replies: { _id: bson.ObjectID.createFromHexString(replyId) } }
+      }
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount !== 1) {
+        response = {
+          status: false,
+          msg: `Unable to delete reply thread:${threadId} replyId:${replyId}`
+        }
+        logger.debug(response.msg)
+      } else {
+        response = {
+          status: true,
+          msg: 'success',
+          replyId: replyId
+        }
+        logger.debug(`deleted reply for thread:${threadId} replyId:${replyId}`)
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Unable to delete reply for threadId:${threadId}`)
+    }
+    return response
   }
 
   static async AddReplyUpvote () {
