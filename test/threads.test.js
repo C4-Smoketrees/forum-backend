@@ -86,5 +86,50 @@ describe('# Threads test-suite', function () {
         assert.equal(e.message, 'Illegal Command')
       }
     })
+    it('Upvote a content', async function () {
+      try {
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          content: 'upvote content'
+        }, app.locals.threadCollection)
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const user = new bson.ObjectID(bson.ObjectID.generate())
+        const res2 = await Thread.AddUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const res3 = await Thread.AddUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isFalse(res3.status)
+        const res4 = await Thread.RemoveUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res5 = await Thread.AddUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res5.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
+
+    it('Downvote a content', async function () {
+      try {
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          content: 'upvote content'
+        }, app.locals.threadCollection)
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const user = new bson.ObjectID(bson.ObjectID.generate())
+        const res2 = await Thread.AddDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const res3 = await Thread.AddDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isFalse(res3.status)
+        const res4 = await Thread.RemoveDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res5 = await Thread.AddDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res5.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
   })
 })

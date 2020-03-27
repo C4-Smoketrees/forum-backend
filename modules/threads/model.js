@@ -208,7 +208,7 @@ class Thread {
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
-      if (res === 1) {
+      if (res.modifiedCount === 1) {
         response = {
           status: true
         }
@@ -234,7 +234,7 @@ class Thread {
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
-      if (res === 1) {
+      if (res.modifiedCount === 1) {
         response = {
           status: true
         }
@@ -260,7 +260,7 @@ class Thread {
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
-      if (res === 1) {
+      if (res.modifiedCount === 1) {
         response = {
           status: true
         }
@@ -286,7 +286,7 @@ class Thread {
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
-      if (res === 1) {
+      if (res.modifiedCount === 1) {
         response = {
           status: true
         }
