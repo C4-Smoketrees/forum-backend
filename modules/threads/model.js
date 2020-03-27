@@ -199,6 +199,111 @@ class Thread {
 
     return func()
   }
+
+  // TODO
+  static async AddUpvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
+  }
+
+  static async AddDownvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
+  }
+
+  static async RemoveDownvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
+  }
+
+  static async RemoveUpvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
+  }
 }
 
 module.exports = Thread

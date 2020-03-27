@@ -58,6 +58,10 @@ class Report {
     }
     return func()
   }
+
+  // TODO
+  static createReplyReport (threadId, replyId, report, threadCollection) {
+  }
 }
 
 module.exports = Report

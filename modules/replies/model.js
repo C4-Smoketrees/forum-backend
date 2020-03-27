@@ -48,6 +48,29 @@ class Reply {
     }
     return response
   }
+
+  // TODO
+  async updateReplyContent (threadId, threadCollection) {
+  }
+
+  static async deleteReply (threadId, replyId, threadCollection) {
+  }
+
+  static async readReplies (threadId, threadCollection) {
+  }
+
+  static async AddUpvote () {
+  }
+
+  static async AddDownvote () {
+  }
+
+  static async RemoveDownvote () {
+  }
+
+  static async RemoveUpvote () {
+  }
+
 }
 
 module.exports = Reply
