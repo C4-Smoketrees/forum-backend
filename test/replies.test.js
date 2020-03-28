@@ -64,5 +64,118 @@ describe('# Replies test-suite', function () {
       const res4 = await Reply.deleteReply(thread._id.toHexString(), reply1._id.toHexString(), app.locals.threadCollection)
       assert.isFalse(res4.status)
     })
+
+    it('Upvote a reply', async function () {
+      try {
+        const author = new bson.ObjectID(bson.ObjectID.generate())
+        const thread = new Thread({
+          author: author,
+          content: 'upvote content'
+        })
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const reply1 = new Reply({ content: 'upvote content', author: author })
+        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const reply2 = new Reply({ content: 'not upvote content', author: author })
+        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res3.status)
+        const res4 = await Reply.addReplyUpvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
+          , app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res5 = await Reply.addReplyUpvote(thread._id.toHexString(), author.toHexString(), author.toHexString(),
+          app.locals.threadCollection)
+        assert.isFalse(res5.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
+
+    it('Downvote a reply', async function () {
+      try {
+        const author = new bson.ObjectID(bson.ObjectID.generate())
+        const thread = new Thread({
+          author: author,
+          content: 'upvote content'
+        })
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const reply1 = new Reply({ content: 'downvote content', author: author })
+        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const reply2 = new Reply({ content: 'not downvote content', author: author })
+        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res3.status)
+        const res4 = await Reply.addReplyDownvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
+          , app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res5 = await Reply.addReplyDownvote(thread._id.toHexString(), author.toHexString(), author.toHexString(),
+          app.locals.threadCollection)
+        assert.isFalse(res5.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
+
+    it('remove Upvote a reply', async function () {
+      try {
+        const author = new bson.ObjectID(bson.ObjectID.generate())
+        const thread = new Thread({
+          author: author,
+          content: 'upvote content'
+        })
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const reply1 = new Reply({ content: 'upvote content', author: author })
+        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const reply2 = new Reply({ content: 'not upvote content', author: author })
+        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res3.status)
+        const res4 = await Reply.addReplyUpvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
+          , app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res5 = await Reply.removeReplyUpvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
+          , app.locals.threadCollection)
+        assert.isTrue(res5.status)
+        const res6 = await Reply.removeReplyUpvote(thread._id.toHexString(), author.toHexString(), author.toHexString(),
+          app.locals.threadCollection)
+        assert.isFalse(res6.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
+    it('remove downvote a reply', async function () {
+      try {
+        const author = new bson.ObjectID(bson.ObjectID.generate())
+        const thread = new Thread({
+          author: author,
+          content: 'upvote content'
+        })
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const reply1 = new Reply({ content: 'upvote content', author: author })
+        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const reply2 = new Reply({ content: 'not upvote content', author: author })
+        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res3.status)
+        const res4 = await Reply.addReplyDownvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
+          , app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res5 = await Reply.removeReplyDownvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
+          , app.locals.threadCollection)
+        assert.isTrue(res5.status)
+        const res6 = await Reply.removeReplyDownvote(thread._id.toHexString(), author.toHexString(), author.toHexString(),
+          app.locals.threadCollection)
+        assert.isFalse(res6.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
   })
 })

@@ -123,16 +123,144 @@ class Reply {
     return response
   }
 
-  static async AddReplyUpvote () {
+  static async addReplyUpvote (threadId, replyId, userId, threadCollection) {
+    const filter = {
+      _id: bson.ObjectID.createFromHexString(threadId),
+      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+    }
+    const query = {
+      $addToSet: { 'replies.$.upvotes': bson.ObjectID.createFromHexString(userId) }
+    }
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount !== 1) {
+        response = {
+          status: false,
+          msg: `Unable to add upvote for reply for thread:${threadId} replyId:${replyId}`
+        }
+        logger.debug(response.msg)
+      } else {
+        response = {
+          status: true,
+          msg: 'success',
+          replyId: replyId
+        }
+        logger.debug(`Added upvote for reply for thread:${threadId} replyId:${replyId}`)
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Unable add upvote for reply for threadId:${threadId}`)
+    }
+    return response
   }
 
-  static async AddReplyDownvote () {
+  static async addReplyDownvote (threadId, replyId, userId, threadCollection) {
+    const filter = {
+      _id: bson.ObjectID.createFromHexString(threadId),
+      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+    }
+    const query = {
+      $addToSet: { 'replies.$.downvotes': bson.ObjectID.createFromHexString(userId) }
+    }
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount !== 1) {
+        response = {
+          status: false,
+          msg: `Unable to add downvote for reply for thread:${threadId} replyId:${replyId}`
+        }
+        logger.debug(response.msg)
+      } else {
+        response = {
+          status: true,
+          msg: 'success',
+          replyId: replyId
+        }
+        logger.debug(`Added downvote for reply for thread:${threadId} replyId:${replyId}`)
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Unable add downvote for reply for threadId:${threadId}`)
+    }
+    return response
   }
 
-  static async RemoveReplyDownvote () {
+  static async removeReplyUpvote (threadId, replyId, userId, threadCollection) {
+    const filter = {
+      _id: bson.ObjectID.createFromHexString(threadId),
+      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+    }
+    const query = {
+      $pull: { 'replies.$.upvotes': bson.ObjectID.createFromHexString(userId) }
+    }
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount !== 1) {
+        response = {
+          status: false,
+          msg: `Unable to remove upvote for reply for thread:${threadId} replyId:${replyId}`
+        }
+        logger.debug(response.msg)
+      } else {
+        response = {
+          status: true,
+          msg: 'success',
+          replyId: replyId
+        }
+        logger.debug(`Removed upvote for reply for thread:${threadId} replyId:${replyId}`)
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Unable remove upvote for reply for threadId:${threadId}`)
+    }
+    return response
   }
 
-  static async RemoveReplyUpvote () {
+  static async removeReplyDownvote (threadId, replyId, userId, threadCollection) {
+    const filter = {
+      _id: bson.ObjectID.createFromHexString(threadId),
+      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+    }
+    const query = {
+      $pull: { 'replies.$.downvotes': bson.ObjectID.createFromHexString(userId) }
+    }
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount !== 1) {
+        response = {
+          status: false,
+          msg: `Unable to remove downvote for reply for thread:${threadId} replyId:${replyId}`
+        }
+        logger.debug(response.msg)
+      } else {
+        response = {
+          status: true,
+          msg: 'success',
+          replyId: replyId
+        }
+        logger.debug(`Removed downvote for reply for thread:${threadId} replyId:${replyId}`)
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Unable remove downvote for reply for threadId:${threadId}`)
+    }
+    return response
   }
 }
 
