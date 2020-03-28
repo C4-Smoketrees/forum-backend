@@ -200,8 +200,7 @@ class Thread {
     return func()
   }
 
-  // TODO
-  static async AddUpvote (threadId, userId, threadCollection) {
+  static async addUpvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
     const query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } }
 
@@ -227,7 +226,7 @@ class Thread {
     return response
   }
 
-  static async AddDownvote (threadId, userId, threadCollection) {
+  static async addDownvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
     const query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } }
 
@@ -253,7 +252,7 @@ class Thread {
     return response
   }
 
-  static async RemoveDownvote (threadId, userId, threadCollection) {
+  static async removeDownvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
     const query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } }
 
@@ -279,7 +278,7 @@ class Thread {
     return response
   }
 
-  static async RemoveUpvote (threadId, userId, threadCollection) {
+  static async removeUpvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
     const query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } }
 

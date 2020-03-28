@@ -1,19 +1,11 @@
 const { assert } = require('chai')
-const { describe, beforeEach, it } = require('mocha')
+const { describe, it } = require('mocha')
 const app = require('../app')
 const Thread = require('../modules/threads/model')
 const Report = require('../modules/reports/model')
 const bson = require('bson')
 
 describe('# Reports test-suite', function () {
-  beforeEach(async function () {
-    await app.locals.dbClient
-    try {
-      await app.locals.threadCollection.drop()
-    } catch (e) {
-    }
-  })
-
   describe('# CRUD for reports', function () {
     it('Create a report', async function () {
       try {
