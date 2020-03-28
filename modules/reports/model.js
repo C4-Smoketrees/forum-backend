@@ -58,6 +58,52 @@ class Report {
     }
     return func()
   }
+
+  static async createReplyReport (threadId, replyId, report, threadCollection) {
+    try {
+      let response
+      const threadObjectId = bson.ObjectId.createFromHexString(threadId)
+      const replyObjectId = bson.ObjectID.createFromHexString(replyId)
+      let filter = {
+        _id: threadObjectId,
+        replies: {
+          $elemMatch: {
+            _id: replyObjectId,
+            reports: { $elemMatch: { userId: report.userId } }
+          }
+        }
+      }
+      const thread = await threadCollection.findOne(filter)
+      if (thread == null) {
+        filter = {
+          _id: threadObjectId,
+          replies: {
+            $elemMatch: {
+              _id: replyObjectId
+            }
+          }
+        }
+        report._id = new bson.ObjectID(bson.ObjectID.generate())
+        const query = { $push: { 'replies.$.reports': report } }
+        const res = await threadCollection.updateOne(filter, query)
+        if (res.modifiedCount === 1) {
+          response = { status: true, reportId: report._id.toHexString(), msg: 'success' }
+          logger.debug(`Reported report_id:${report._id.toHexString()}`)
+        } else {
+          logger.warn(`Unable to report threadId:${threadId} replyId:${replyId} userId:${report.userId.toHexString()}`)
+          response = { status: false, err: `matched:${res.matchedCount} modified:${res.modifiedCount}` }
+        }
+      } else {
+        response = { status: false, err: 'already reported' }
+        logger.debug(`Already reported thread_id:${threadId} replyId:${replyId}  user_id:${report.userId.toHexString()}`)
+      }
+      return response
+    } catch (e) {
+      const response = { status: false, err: e.message }
+      logger.error(`Error in creating report for the user and reply:${replyId}`)
+      return response
+    }
+  }
 }
 
 module.exports = Report

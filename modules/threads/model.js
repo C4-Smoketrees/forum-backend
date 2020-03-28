@@ -23,6 +23,7 @@ class Thread {
    * @param {array(bson.ObjectID)=[]} [thread.downvotes] Downvotes array
    * @param {bson.ObjectID} thread.author Author of the thread
    * @param {number=0} [thread.stars] Stars for the post
+   * @param {number=time.now()} thread.astUpdate Last updated
    */
   constructor (thread) {
     this._id = thread._id
@@ -34,6 +35,7 @@ class Thread {
     this.downvotes = thread.downvotes
     this.author = thread.author
     this.stars = thread.stars
+    this.lastUpdate = thread.lastUpdate
   }
 
   /**
@@ -52,6 +54,7 @@ class Thread {
         this.upvotes = []
         this.downvotes = []
         this.stars = 0
+        this.lastUpdate = Date.now()
         await threadCollection.insertOne(this)
         const response = {
           status: true,
@@ -75,7 +78,7 @@ class Thread {
    */
   updateThreadContent (threadCollection) {
     const filter = { _id: this._id }
-    const query = { $set: { content: this.content } }
+    const query = { $set: { content: this.content, lastUpdate: Date.now() } }
 
     const func = async () => {
       try {
@@ -195,6 +198,110 @@ class Thread {
     }
 
     return func()
+  }
+
+  static async addUpvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
+  }
+
+  static async addDownvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
+  }
+
+  static async removeDownvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
+  }
+
+  static async removeUpvote (threadId, userId, threadCollection) {
+    const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
+    const query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } }
+
+    let response
+    try {
+      const res = await threadCollection.updateOne(filter, query)
+      if (res.modifiedCount === 1) {
+        response = {
+          status: true
+        }
+      } else {
+        response = {
+          status: false
+        }
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
+    }
+    return response
   }
 }
 

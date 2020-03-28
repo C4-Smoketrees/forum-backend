@@ -1,5 +1,5 @@
 const { assert } = require('chai')
-const { describe, beforeEach, it, after } = require('mocha')
+const { describe, before, it, after } = require('mocha')
 const app = require('../app')
 const Thread = require('../modules/threads/model')
 const bson = require('bson')
@@ -7,15 +7,14 @@ const bson = require('bson')
 after(async function () {
   await app.locals.dbClient.close()
 })
-
+before(async function () {
+  await app.locals.dbClient
+  try {
+    await app.locals.threadCollection.drop()
+  } catch (e) {
+  }
+})
 describe('# Threads test-suite', function () {
-  beforeEach(async function () {
-    await app.locals.dbClient
-    try {
-      await app.locals.threadCollection.drop()
-    } catch (e) {
-    }
-  })
   describe('# Crud Operations', function () {
     // Create a new thread and update it
     it('Create a new thread and update it', async function () {
@@ -68,7 +67,7 @@ describe('# Threads test-suite', function () {
         const thread = new Thread({
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'stars content'
-        }, app.locals.threadCollection)
+        })
         const res = await thread.createThread(app.locals.threadCollection)
         assert.isTrue(res.status)
         const res2 = await Thread.updateStars(thread._id.toHexString(), 'inc', app.locals.threadCollection)
@@ -79,12 +78,62 @@ describe('# Threads test-suite', function () {
         assert.isTrue(res4.status)
         const res5 = await Thread.readThreadUsingId(thread._id.toHexString(), app.locals.threadCollection)
         assert.equal(res5.thread.stars, 1, 'Stars expected')
-        const res6 = await Thread.updateStars(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), 'inc', app.locals.threadCollection)
+        const res6 = await Thread.updateStars(new bson.ObjectID(bson.ObjectID.generate()).toHexString(),
+          'inc', app.locals.threadCollection)
         assert.isFalse(res6.status)
         const res7 = await Thread.updateStars(thread._id.toHexString(), 'invalid', app.locals.threadCollection)
         assert.isFalse(res7.status)
       } catch (e) {
         assert.equal(e.message, 'Illegal Command')
+      }
+    })
+    it('Upvote a content', async function () {
+      try {
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          content: 'upvote content'
+        })
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const user = new bson.ObjectID(bson.ObjectID.generate())
+        const res2 = await Thread.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const res3 = await Thread.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isFalse(res3.status)
+        const res4 = await Thread.removeUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res6 = await Thread.removeUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isFalse(res6.status)
+        const res5 = await Thread.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res5.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
+
+    it('Downvote a content', async function () {
+      try {
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          content: 'upvote content'
+        })
+        const res1 = await thread.createThread(app.locals.threadCollection)
+        assert.isTrue(res1.status)
+        const user = new bson.ObjectID(bson.ObjectID.generate())
+        const res2 = await Thread.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res2.status)
+        const res3 = await Thread.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isFalse(res3.status)
+        const res4 = await Thread.removeDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res4.status)
+        const res6 = await Thread.removeDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isFalse(res6.status)
+        const res5 = await Thread.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
+        assert.isTrue(res5.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
       }
     })
   })
