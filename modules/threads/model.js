@@ -12,8 +12,9 @@ const logger = require('../../logging/logger')
 class Thread {
   /**
    * Create an instance of thread
-   * @param {{author: ObjectId, content: string}} thread Object representing the Thread
+   * @param {{author: ObjectId, content: string,title:string}} thread Object representing the Thread
    * @param {Thread} thread Object representing a thread
+   * @param {string} thread.title Threads title
    * @param {bson.ObjectID=auto_generate} [thread._id] Id for the object
    * @param {string} thread.content Content for the Thread
    * @param {array(Replies)=[]} [thread.replies] Replies array contains Replies
@@ -28,6 +29,7 @@ class Thread {
   constructor (thread) {
     this._id = thread._id
     this.content = thread.content
+    this.title = thread.title
     this.replies = thread.replies
     this.reports = thread.reports
     this.dateTime = thread.dateTime
@@ -78,7 +80,7 @@ class Thread {
    */
   updateThreadContent (threadCollection) {
     const filter = { _id: this._id }
-    const query = { $set: { content: this.content, lastUpdate: Date.now() } }
+    const query = { $set: { content: this.content, lastUpdate: Date.now(), title: this.title } }
 
     const func = async () => {
       try {

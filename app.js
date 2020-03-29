@@ -12,8 +12,9 @@ const dbConn = async () => {
   try {
     const dbPromise = MongoClient.connect(dbConnectionString, { useUnifiedTopology: true })
     app.locals.dbClient = await dbPromise
-    app.locals.db = app.locals.dbClient.db('forum')
+    app.locals.db = await app.locals.dbClient.db('forum')
     app.locals.threadCollection = await app.locals.db.collection('threads')
+    app.locals.userCollection = await app.locals.db.collection('users')
   } catch (e) {
     console.log(e)
     process.exit(2)

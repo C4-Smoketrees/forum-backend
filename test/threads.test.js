@@ -20,7 +20,11 @@ describe('# Threads test-suite', function () {
     it('Create a new thread and update it', async function () {
       // For Callback (Passing)
       try {
-        const thread = new Thread({ author: new bson.ObjectID(bson.ObjectID.generate()), content: 'test content' })
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          title: 'test title',
+          content: 'test content'
+        })
         const res = await thread.createThread(app.locals.threadCollection)
         assert.isTrue(res.status)
         thread.content = 'update content'
@@ -35,7 +39,10 @@ describe('# Threads test-suite', function () {
     it('Create a new thread and read it', async function () {
       // For Callback (Passing)
       try {
-        const thread = new Thread({ author: new bson.ObjectID(bson.ObjectID.generate()), content: 'read content' })
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          content: 'read content'
+        })
         const res = await thread.createThread(app.locals.threadCollection)
         assert.isTrue(res.status)
         const res2 = await Thread.readThreadUsingId(thread._id.toHexString(), app.locals.threadCollection)

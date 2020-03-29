@@ -52,7 +52,7 @@ class Report {
         return response
       } catch (e) {
         const response = { status: false, err: e.message }
-        logger.error('Error in creating report for the user')
+        logger.error('Error in creating report for the users')
         return response
       }
     }
