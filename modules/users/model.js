@@ -1,6 +1,7 @@
 const ObjectId = require('bson').ObjectID
 const logger = require('../../logging/logger')
 const Thread = require('../threads/model')
+const Reply = require('../replies/model')
 
 /**
  * User class represents the business logic
@@ -214,10 +215,51 @@ class User {
     return { status: true }
   }
 
-  async addReply () {
+  /**
+   *
+   * @param {Reply} reply
+   * @param {string} threadId
+   * @param userCollection
+   * @param threadCollection
+   * @returns {Promise<{status: boolean}>}
+   */
+  async addReply (reply, threadId, userCollection, threadCollection) {
+    const res1 = await reply.createReply(threadId, threadCollection)
+    if (!res1.status) {
+      return { status: false }
+    }
+    const replyId = res1.replyId
+    try {
+      const filter = { _id: this._id }
+      const update = { $push: { replies: ObjectId.createFromHexString(replyId) } }
+      const res2 = await userCollection.updateOne(filter, update)
+      if (res2.modifiedCount !== 1) {
+        return { status: false }
+      }
+    } catch (e) {
+      logger.error(`Error in adding reply to user:${this._id.toHexString()} replyId:${replyId}`)
+      return { status: false }
+    }
+    return { status: true }
   }
 
-  async deleteReply () {
+  async deleteReply (replyId, threadId, userCollection, threadCollection) {
+    const res1 = await Reply.deleteReply(threadId, replyId, threadCollection)
+    if (!res1.status) {
+      return { status: false }
+    }
+    try {
+      const filter = { _id: this._id }
+      const update = { $push: { replies: ObjectId.createFromHexString(replyId) } }
+      const res2 = await userCollection.updateOne(filter, update)
+      if (res2.modifiedCount !== 1) {
+        return { status: false }
+      }
+    } catch (e) {
+      logger.error(`Error in adding reply to user:${this._id.toHexString()} replyId:${replyId}`)
+      return { status: false }
+    }
+    return { status: true }
   }
 }
 
