@@ -92,5 +92,17 @@ describe('# User test-suite', function () {
       console.log(res2)
       assert.isTrue(res2.status)
     })
+    it('Delete a thread', async function () {
+      const draft = { content: 'draft content', title: 'draft title' }
+      const author1 = new bson.ObjectID(bson.ObjectID.generate())
+      const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
+      assert.isTrue(res1.status)
+      const user = new User({ _id: author1 })
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
+      console.log(res2)
+      assert.isTrue(res2.status)
+      const res3 = await user.deleteThread(res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+      assert.isTrue(res3.status)
+    })
   })
 })

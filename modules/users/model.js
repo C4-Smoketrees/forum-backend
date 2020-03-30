@@ -9,7 +9,7 @@ class User {
   constructor (object) {
     this._id = object._id
     this.stars = object.stars
-    this.posts = object.posts
+    this.threads = object.threads
     this.replies = object.replies
     this.drafts = object.drafts
   }
@@ -130,15 +130,15 @@ class User {
     }
     try {
       const filter = { _id: this._id }
-      const query = { $push: { posts: thread._id } }
+      const query = { $push: { threads: thread._id } }
       const res2 = await userCollection.updateOne(filter, query, { upsert: true })
       if (res2.modifiedCount !== 1) {
-        logger.error('Error in publishing draft(adding to the user posts)', {
+        logger.error('Error in publishing draft(adding to the user threads)', {
           query: query,
           filter: filter,
           response: res2
         })
-        response = { status: false, msg: 'Error in adding to user posts' }
+        response = { status: false, msg: 'Error in adding to user threads' }
       }
       response = { status: true, threadId: thread._id.toHexString(), draftId: draft._id.toHexString() }
     } catch (e) {
@@ -154,22 +154,38 @@ class User {
       }
       return response
     }
+    return response
+  }
+
+  async deleteThread (threadId, userCollection, threadCollection) {
+    const res = await Thread.deleteThreadUsingId(threadId, threadCollection)
+    if (!res.status) {
+      return { status: false }
+    }
+    try {
+      const filter = { _id: this._id }
+      const update = { $pull: { threads: ObjectId.createFromHexString(threadId) } }
+      const res2 = await userCollection.updateOne(filter, update)
+      if (res2.modifiedCount !== 1) {
+        return { status: false }
+      }
+    } catch (e) {
+      logger.error('Error in deleting thread from the user collection', { err: e })
+      return { status: false }
+    }
     return { status: true }
   }
 
-  static async deletePost () {
+  async addStar () {
   }
 
-  static async addStar () {
+  async removeStar () {
   }
 
-  static async removeStar () {
+  async addReply () {
   }
 
-  static async addReply () {
-  }
-
-  static async deleteReply () {
+  async deleteReply () {
   }
 }
 
