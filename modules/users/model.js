@@ -176,10 +176,42 @@ class User {
     return { status: true }
   }
 
-  async addStar () {
+  async addStar (threadId, userCollection, threadCollection) {
+    const res = await Thread.updateStars(threadId, 'inc', threadCollection)
+    if (!res.status) {
+      return { status: false }
+    }
+    try {
+      const filter = { _id: this._id }
+      const update = { $push: { stars: ObjectId.createFromHexString(threadId) } }
+      const res2 = await userCollection.updateOne(filter, update)
+      if (res2.modifiedCount !== 1) {
+        return { status: false }
+      }
+    } catch (e) {
+      logger.error('Error in adding stars from the user collection', { err: e })
+      return { status: false }
+    }
+    return { status: true }
   }
 
-  async removeStar () {
+  async removeStar (threadId, userCollection, threadCollection) {
+    const res = await Thread.updateStars(threadId, 'dec', threadCollection)
+    if (!res.status) {
+      return { status: false }
+    }
+    try {
+      const filter = { _id: this._id }
+      const update = { $pull: { stars: ObjectId.createFromHexString(threadId) } }
+      const res2 = await userCollection.updateOne(filter, update)
+      if (res2.modifiedCount !== 1) {
+        return { status: false }
+      }
+    } catch (e) {
+      logger.error('Error in removing stars from the user collection', { err: e })
+      return { status: false }
+    }
+    return { status: true }
   }
 
   async addReply () {
