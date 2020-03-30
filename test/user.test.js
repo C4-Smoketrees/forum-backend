@@ -38,12 +38,12 @@ describe('# User test-suite', function () {
         const author1 = new bson.ObjectID(bson.ObjectID.generate())
         const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
         assert.isTrue(res1.status)
-        draft._id = res1.draftId
+        draft._id = bson.ObjectID.createFromHexString(res1.draftId)
         draft.title = 'draft title2'
         draft.content = 'draft content2'
         const res2 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
         assert.isTrue(res2.status)
-        draft._id = res1.draftId
+        draft._id = bson.ObjectID.createFromHexString(res1.draftId)
         draft.title = 'update draft'
         draft.content = 'update draft content2'
         const res3 = await User.updateDraft(author1.toHexString(), draft, app.locals.userCollection)
@@ -63,7 +63,7 @@ describe('# User test-suite', function () {
         draft.title = 'draft title 2'
         const res2 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
         assert.isTrue(res2.status)
-        const res3 = await User.readDraft(author1.toHexString(), res2.draftId.toHexString(), app.locals.userCollection)
+        const res3 = await User.readDraft(author1.toHexString(), res2.draftId, app.locals.userCollection)
         if (res3.draft.content !== 'draft content 2') {
           assert.isTrue(false)
         }
@@ -77,11 +77,20 @@ describe('# User test-suite', function () {
       const author1 = new bson.ObjectID(bson.ObjectID.generate())
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
       assert.isTrue(res1.status)
-      console.log(res1)
       const res2 = await User.deleteDraft(author1.toHexString(), draft._id.toHexString(), app.locals.userCollection)
       assert.isTrue(res2.status)
       const res3 = await User.deleteDraft(author1.toHexString(), draft._id.toHexString(), app.locals.userCollection)
       assert.isFalse(res3.status)
+    })
+    it('Publish a draft', async function () {
+      const draft = { content: 'draft content', title: 'draft title' }
+      const author1 = new bson.ObjectID(bson.ObjectID.generate())
+      const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
+      assert.isTrue(res1.status)
+      const user = new User({ _id: author1 })
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
+      console.log(res2)
+      assert.isTrue(res2.status)
     })
   })
 })

@@ -1,5 +1,6 @@
 const ObjectId = require('bson').ObjectID
 const logger = require('../../logging/logger')
+const Thread = require('../threads/model')
 
 /**
  * User class represents the business logic
@@ -7,16 +8,16 @@ const logger = require('../../logging/logger')
 class User {
   constructor (object) {
     this._id = object._id
-    this.stars = object._id
-    this.posts = object._id
-    this.replies = object._id
-    this.drafts = object._id
+    this.stars = object.stars
+    this.posts = object.posts
+    this.replies = object.replies
+    this.drafts = object.drafts
   }
 
   /**
    *
    * @param {string} userId
-   * @param {{content:string,title:string}} draft
+   * @param {{content:string,title:string,_id?:ObjectId}} draft
    * @param {Collection} userCollection
    * @returns {Promise<void>}
    */
@@ -28,10 +29,10 @@ class User {
       const query = { $push: { drafts: draft } }
       const res = await userCollection.updateOne(filter, query, { upsert: true })
       if (res.modifiedCount === 1) {
-        response = { status: true, draftId: draft._id }
+        response = { status: true, draftId: draft._id.toHexString() }
         logger.debug(`Created a draft for user:${userId} draftId:${draft._id.toHexString()}`)
       } else {
-        response = { status: true, draftId: draft._id, userId: res.upsertedId._id.toHexString() }
+        response = { status: true, draftId: draft._id.toHexString(), userId: res.upsertedId._id.toHexString() }
         logger.debug(`Created a draft for user:${userId} draftId:${draft._id.toHexString()}`)
       }
     } catch (e) {
@@ -109,15 +110,67 @@ class User {
     return response
   }
 
-  static publishDraft (draftId) {
+  async publishDraft (draftId, userCollection, threadCollection) {
+    const draft = (await User.readDraft(this._id.toHexString(), draftId, userCollection)).draft
+    console.log(draft)
+    console.log(draft)
+    const thread = new Thread({
+      content: draft.content,
+      title: draft.title,
+      author: this._id
+    })
+    let response
+    const res = await thread.createThread(threadCollection)
+    if (!res.status) {
+      if (res.err) {
+        response = { status: false, msg: 'error occurred', err: res.err }
+      }
+      response = { status: false }
+      return response
+    }
+    try {
+      const filter = { _id: this._id }
+      const query = { $push: { posts: thread._id } }
+      const res2 = await userCollection.updateOne(filter, query, { upsert: true })
+      if (res2.modifiedCount !== 1) {
+        logger.error('Error in publishing draft(adding to the user posts)', {
+          query: query,
+          filter: filter,
+          response: res2
+        })
+        response = { status: false, msg: 'Error in adding to user posts' }
+      }
+      response = { status: true, threadId: thread._id.toHexString(), draftId: draft._id.toHexString() }
+    } catch (e) {
+      response = { status: false, err: e }
+      return response
+    }
+    const res3 = await User.deleteDraft(this._id.toHexString(), draftId, userCollection)
+    if (!res3.status) {
+      if (res3.err) {
+        response = { status: false, err: res3.err }
+      } else {
+        response = { status: false, res: res3.res }
+      }
+      return response
+    }
+    return { status: true }
+  }
+
+  static async deletePost () {
   }
 
   static async addStar () {
   }
 
-  static async reply () {
+  static async removeStar () {
+  }
+
+  static async addReply () {
+  }
+
+  static async deleteReply () {
   }
 }
 
-module
-  .exports = User
+module.exports = User
