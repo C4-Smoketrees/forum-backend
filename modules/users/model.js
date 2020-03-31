@@ -43,7 +43,6 @@ class User {
           await tagCollection.updateOne({}, { $addToSet: { tags: tag } }, { upsert: true })
         }
       }
-
     } catch (e) {
       response = { status: false, err: e }
       console.log(e)
@@ -80,7 +79,6 @@ class User {
           await tagCollection.updateOne({}, { $addToSet: { tags: tag } }, { upsert: true })
         }
       }
-
     } catch (e) {
       response = { status: false, err: e }
       console.log(e)

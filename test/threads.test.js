@@ -10,7 +10,7 @@ after(async function () {
 before(async function () {
   await app.locals.dbClient
   try {
-    await app.locals.threadCollection.drop()
+    (await app.locals.threadCollection).drop()
   } catch (e) {
   }
 })
@@ -80,6 +80,29 @@ describe('# Threads test-suite', function () {
         assert.isTrue(res2.status)
         const res3 = await Thread.deleteThreadUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), app.locals.threadCollection)
         assert.isFalse(res3.status)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
+    it('Find using thread tag', async function () {
+      try {
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          content: 'tag content',
+          tags: ['google', 'noob']
+        })
+        let res = await Thread.createThread(thread, app.locals.threadCollection)
+        assert.isTrue(res.status)
+        thread.tags = ['google', 'twitter']
+        res = await Thread.createThread(thread, app.locals.threadCollection)
+        assert.isTrue(res.status)
+        thread.tags = ['hello', 'twitter']
+        res = await Thread.createThread(thread, app.locals.threadCollection)
+        assert.isTrue(res.status)
+        res = await Thread.readThreadByTag('twitter', app.locals.threadCollection)
+        console.log(res.threads.length)
+        assert.isTrue(res.status)
       } catch (e) {
         console.log(e)
         assert.isTrue(false)

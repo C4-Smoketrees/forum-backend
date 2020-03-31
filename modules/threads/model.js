@@ -136,12 +136,14 @@ class Thread {
     try {
       let doc
       const threads = []
+      let length = 0
       const res = await threadCollection.find({})
       while (await res.hasNext()) {
         doc = await res.next()
         threads.push(doc)
+        length += 1
       }
-      return { status: true, threads: threads }
+      return { status: true, threads: threads, length: length }
     } catch (e) {
       const res = { status: false }
       logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }))
@@ -232,6 +234,24 @@ class Thread {
     }
 
     return func()
+  }
+
+  static async readThreadByTag (tag, threadCollection) {
+    try {
+      const filter = { tags: tag }
+      const res = await threadCollection.find(filter)
+      const threads = []
+      let doc
+      while (await res.hasNext()) {
+        doc = await res.next()
+        threads.push(doc)
+      }
+      return { status: true, threads: threads }
+    } catch (e) {
+      const res = { status: false }
+      logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }))
+      return res
+    }
   }
 
   static async addUpvote (threadId, userId, threadCollection) {
