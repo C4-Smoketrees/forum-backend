@@ -132,6 +132,23 @@ class Thread {
     return func()
   }
 
+  static async readAllThreads (threadCollection) {
+    try {
+      let doc
+      const threads = []
+      const res = await threadCollection.find({})
+      while (await res.hasNext()) {
+        doc = await res.next()
+        threads.push(doc)
+      }
+      return { status: true, threads: threads }
+    } catch (e) {
+      const res = { status: false }
+      logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }))
+      return res
+    }
+  }
+
   /**
    * Delete a thread from the id
    * @param {string} id  HexString representing id of the thread
@@ -159,6 +176,20 @@ class Thread {
       }
     }
     return func()
+  }
+
+  static async readTags (tagCollection) {
+    try {
+      const res = await tagCollection.findOne({})
+      if (!res) {
+        return { status: false }
+      }
+      const tags = res.tags
+      return { status: true, tags: tags }
+    } catch (e) {
+      logger.error('Error in reading the tags', { err: e })
+      return { status: false, err: e }
+    }
   }
 
   /**

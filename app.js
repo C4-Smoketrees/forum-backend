@@ -15,6 +15,7 @@ const dbConn = async () => {
     app.locals.db = await app.locals.dbClient.db('forum')
     app.locals.threadCollection = await app.locals.db.collection('threads')
     app.locals.userCollection = await app.locals.db.collection('users')
+    app.locals.tagCollection = await app.locals.db.collection('tags')
   } catch (e) {
     console.log(e)
     process.exit(2)

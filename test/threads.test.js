@@ -54,6 +54,22 @@ describe('# Threads test-suite', function () {
         assert.isTrue(false)
       }
     })
+    it('Real all threads', async function () {
+      // For Callback (Passing)
+      try {
+        const thread = new Thread({
+          author: new bson.ObjectID(bson.ObjectID.generate()),
+          content: 'read content'
+        })
+        const res = await Thread.createThread(thread, app.locals.threadCollection)
+        assert.isTrue(res.status)
+        const res2 = await Thread.readAllThreads(app.locals.threadCollection)
+        console.log(res2)
+      } catch (e) {
+        console.log(e)
+        assert.isTrue(false)
+      }
+    })
     it('Create a new Thread and delete it', async function () {
       // For Callback (Passing)
       try {

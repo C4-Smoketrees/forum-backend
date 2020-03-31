@@ -20,9 +20,10 @@ class User {
    * @param {string} userId
    * @param {{content:string,title:string,_id?:ObjectId,tags:string[]}} draft
    * @param {Collection} userCollection
+   * @param {Collection} tagCollection
    * @returns {Promise<void>}
    */
-  static async createDraft (userId, draft, userCollection) {
+  static async createDraft (userId, draft, userCollection, tagCollection) {
     let response
     try {
       draft._id = new ObjectId(ObjectId.generate())
@@ -36,14 +37,22 @@ class User {
         response = { status: true, draftId: draft._id.toHexString(), userId: res.upsertedId._id.toHexString() }
         logger.debug(`Created a draft for user:${userId} draftId:${draft._id.toHexString()}`)
       }
+      if (draft.tags) {
+        const tags = draft.tags
+        for (const tag of tags) {
+          await tagCollection.updateOne({}, { $addToSet: { tags: tag } }, { upsert: true })
+        }
+      }
+
     } catch (e) {
       response = { status: false, err: e }
-      logger.error(`Error in creating a draft for user:${userId}`)
+      console.log(e)
+      logger.error(`Error in creating a draft for user:${userId}`, { err: e })
     }
     return response
   }
 
-  static async updateDraft (userId, draft, userCollection) {
+  static async updateDraft (userId, draft, userCollection, tagCollection) {
     let response
     try {
       const filter = {
@@ -65,9 +74,17 @@ class User {
         response = { status: false, res: res }
         logger.debug(`Unable to update a draft for user:${userId} draft:${draft._id.toHexString()}`)
       }
+      if (draft.tags) {
+        const tags = draft.tags
+        for (const tag of tags) {
+          await tagCollection.updateOne({}, { $addToSet: { tags: tag } }, { upsert: true })
+        }
+      }
+
     } catch (e) {
       response = { status: false, err: e }
-      logger.error(`Error in updating a draft for user:${userId}`)
+      console.log(e)
+      logger.error(`Error in updating a draft for user:${userId}`, { err: e })
     }
     return response
   }
