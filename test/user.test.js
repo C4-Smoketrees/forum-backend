@@ -84,8 +84,20 @@ describe('# User test-suite', function () {
       const res3 = await User.deleteDraft(author1.toHexString(), draft._id.toHexString(), app.locals.userCollection)
       assert.isFalse(res3.status)
     })
+    it('Read a user', async function () {
+      const draft = { content: 'draft content', title: 'draft title', tags: ['#google', '#noob'] }
+      const author1 = new bson.ObjectID(bson.ObjectID.generate())
+      const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
+      assert.isTrue(res1.status)
+      const user = new User({ _id: author1 })
+      const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
+      console.log(res2)
+      assert.isTrue(res2.status)
+      const res3 = await User.getUser(author1.toHexString(), app.locals.userCollection)
+      assert.equal(res3.user._id.toHexString(), author1.toHexString())
+    })
     it('Publish a draft', async function () {
-      const draft = { content: 'draft content', title: 'draft title' }
+      const draft = { content: 'draft content', title: 'draft title', tags: ['#google', '#noob'] }
       const author1 = new bson.ObjectID(bson.ObjectID.generate())
       const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection)
       assert.isTrue(res1.status)

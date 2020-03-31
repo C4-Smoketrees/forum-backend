@@ -221,6 +221,22 @@ class User {
     return { status: true }
   }
 
+  static async getUser (userId, userCollection) {
+    try {
+      const filter = { _id: ObjectId.createFromHexString(userId) }
+      const res = await userCollection.findOne(filter)
+      if (res) {
+        logger.debug(`read user: ${userId}`)
+        return { status: true, user: res }
+      }
+      logger.debug(`No user found for userId:${userId}`)
+      return { status: false, err: `No user found for userId:${userId}` }
+    } catch (e) {
+      logger.debug(`Error occurred while reading user:${userId}`, { err: e })
+      return { status: false, err: e }
+    }
+  }
+
   /**
    *
    * @param {Reply} reply
