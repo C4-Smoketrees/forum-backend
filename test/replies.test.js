@@ -9,44 +9,44 @@ describe('# Replies test-suite', function () {
   describe('# CRUD for replies', function () {
     it('Create a new Reply', async function () {
       const thread = new Thread({ content: 'reply thread', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      const res1 = await thread.createThread(app.locals.threadCollection)
+      const res1 = await Thread.createThread(thread, app.locals.threadCollection)
       assert.isTrue(res1.status)
 
       const reply = new Reply({ content: 'reply', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      const res2 = await reply.createReply(thread._id.toHexString(), app.locals.threadCollection)
+      const res2 = await Reply.createReply(reply, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res2.status)
 
-      const res3 = await reply.createReply(reply._id.toHexString(), app.locals.threadCollection)
+      const res3 = await Reply.createReply(reply, reply._id.toHexString(), app.locals.threadCollection)
       assert.isFalse(res3.status)
     })
     it('update a Reply', async function () {
       const thread = new Thread({ content: 'update thread', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      const res1 = await thread.createThread(app.locals.threadCollection)
+      const res1 = await Thread.createThread(thread, app.locals.threadCollection)
       assert.isTrue(res1.status)
 
       const reply1 = new Reply({ content: 'reply 1', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+      const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res2.status)
 
       const reply2 = new Reply({ content: 'reply 2', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+      const res3 = await Reply.createReply(reply2, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res3.status)
       reply2.content = 'update reply'
 
-      const res4 = await reply2.updateReplyContent(thread._id.toHexString(), app.locals.threadCollection)
+      const res4 = await Reply.updateReplyContent(reply2, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res4.status)
 
       reply2._id = new bson.ObjectID(bson.ObjectID.generate())
-      const res5 = await reply2.updateReplyContent(thread._id.toHexString(), app.locals.threadCollection)
+      const res5 = await Reply.updateReplyContent(reply2, thread._id.toHexString(), app.locals.threadCollection)
       assert.isFalse(res5.status)
     })
     it('delete a Reply', async function () {
       const thread = new Thread({ content: 'delete thread', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      const res1 = await thread.createThread(app.locals.threadCollection)
+      const res1 = await Thread.createThread(thread, app.locals.threadCollection)
       assert.isTrue(res1.status)
 
       const reply1 = new Reply({ content: 'reply 1', author: new bson.ObjectID(bson.ObjectID.generate()) })
-      const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+      const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res2.status)
 
       const res3 = await Reply.deleteReply(thread._id.toHexString(), reply1._id.toHexString(), app.locals.threadCollection)
@@ -63,13 +63,13 @@ describe('# Replies test-suite', function () {
           author: author,
           content: 'upvote content'
         })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const reply1 = new Reply({ content: 'upvote content', author: author })
-        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res2.status)
         const reply2 = new Reply({ content: 'not upvote content', author: author })
-        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res3 = await Reply.createReply(reply2, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res3.status)
         const res4 = await Reply.addReplyUpvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
           , app.locals.threadCollection)
@@ -90,13 +90,13 @@ describe('# Replies test-suite', function () {
           author: author,
           content: 'upvote content'
         })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const reply1 = new Reply({ content: 'downvote content', author: author })
-        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res2.status)
         const reply2 = new Reply({ content: 'not downvote content', author: author })
-        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res3 = await Reply.createReply(reply2, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res3.status)
         const res4 = await Reply.addReplyDownvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
           , app.locals.threadCollection)
@@ -117,13 +117,13 @@ describe('# Replies test-suite', function () {
           author: author,
           content: 'upvote content'
         })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const reply1 = new Reply({ content: 'upvote content', author: author })
-        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res2.status)
         const reply2 = new Reply({ content: 'not upvote content', author: author })
-        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res3 = await Reply.createReply(reply2, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res3.status)
         const res4 = await Reply.addReplyUpvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
           , app.locals.threadCollection)
@@ -146,13 +146,13 @@ describe('# Replies test-suite', function () {
           author: author,
           content: 'upvote content'
         })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const reply1 = new Reply({ content: 'upvote content', author: author })
-        const res2 = await reply1.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res2.status)
         const reply2 = new Reply({ content: 'not upvote content', author: author })
-        const res3 = await reply2.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res3 = await Reply.createReply(reply2, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res3.status)
         const res4 = await Reply.addReplyDownvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
           , app.locals.threadCollection)

@@ -12,36 +12,36 @@ class Reply {
     this.reports = object.reports
   }
 
-  async createReply (threadId, threadCollection) {
+  static async createReply (reply, threadId, threadCollection) {
     let response
-    this.upvotes = []
-    this.downvotes = []
-    this.reports = []
+    reply.upvotes = []
+    reply.downvotes = []
+    reply.reports = []
     try {
       const filter = {
         _id: bson.ObjectID.createFromHexString(threadId)
       }
-      this._id = new bson.ObjectID(bson.ObjectId.generate())
-      this.dateTime = Date.now()
+      reply._id = new bson.ObjectID(bson.ObjectId.generate())
+      reply.dateTime = Date.now()
       const query = {
         $push: {
-          replies: this
+          replies: reply
         }
       }
       const res = await threadCollection.updateOne(filter, query)
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to create a reply for thread:${threadId} replyId:${this._id}`
+          msg: `Unable to create a reply for thread:${threadId} replyId:${reply._id}`
         }
         logger.debug(response.msg)
       } else {
         response = {
           status: true,
           msg: 'success',
-          replyId: this._id.toHexString()
+          replyId: reply._id.toHexString()
         }
-        logger.debug(`New reply for thread:${threadId} replyId:${this._id}`)
+        logger.debug(`New reply for thread:${threadId} replyId:${reply._id}`)
       }
     } catch (e) {
       response = {
@@ -52,32 +52,32 @@ class Reply {
     return response
   }
 
-  async updateReplyContent (threadId, threadCollection) {
+  static async updateReplyContent (reply, threadId, threadCollection) {
     let response
     try {
       const filter = {
         _id: bson.ObjectID.createFromHexString(threadId),
-        replies: { $elemMatch: { _id: this._id } }
+        replies: { $elemMatch: { _id: reply._id } }
       }
       const query = {
         $set: {
-          'replies.$.content': this.content
+          'replies.$.content': reply.content
         }
       }
       const res = await threadCollection.updateOne(filter, query)
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to update content for reply a reply for thread:${threadId} replyId:${this._id}`
+          msg: `Unable to update content for reply a reply for thread:${threadId} replyId:${reply._id}`
         }
         logger.debug(response.msg)
       } else {
         response = {
           status: true,
           msg: 'success',
-          replyId: this._id.toHexString()
+          replyId: reply._id.toHexString()
         }
-        logger.debug(`Updated reply for thread:${threadId} replyId:${this._id}`)
+        logger.debug(`Updated reply for thread:${threadId} replyId:${reply._id}`)
       }
     } catch (e) {
       response = {

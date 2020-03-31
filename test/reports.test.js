@@ -11,7 +11,7 @@ describe('# Reports test-suite', function () {
     it('Create a report', async function () {
       try {
         const thread = new Thread({ author: new bson.ObjectID(bson.ObjectID.generate()), content: 'report content' })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const report = new Report({
           reportReason: 1,
@@ -33,10 +33,10 @@ describe('# Reports test-suite', function () {
     it('Create a report for replies', async function () {
       try {
         const thread = new Thread({ author: new bson.ObjectID(bson.ObjectID.generate()), content: 'report content' })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const reply = new Reply({ author: new bson.ObjectID(bson.ObjectID.generate()), content: '12' })
-        const res5 = await reply.createReply(thread._id.toHexString(), app.locals.threadCollection)
+        const res5 = await Reply.createReply(reply, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res5.status)
         const report = new Report({
           reportReason: 1,

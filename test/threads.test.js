@@ -16,8 +16,8 @@ before(async function () {
 })
 describe('# Threads test-suite', function () {
   describe('# Crud Operations', function () {
-    // Create a new thread and update it
-    it('Create a new thread and update it', async function () {
+    // Create a new Thread and update it
+    it('Create a new Thread and update it', async function () {
       // For Callback (Passing)
       try {
         const thread = new Thread({
@@ -25,25 +25,25 @@ describe('# Threads test-suite', function () {
           title: 'test title',
           content: 'test content'
         })
-        const res = await thread.createThread(app.locals.threadCollection)
+        const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         thread.content = 'update content'
-        const res2 = await thread.updateThreadContent(app.locals.threadCollection)
+        const res2 = await Thread.updateThreadContent(thread, app.locals.threadCollection)
         assert.isTrue(res2.status)
         thread._id = new bson.ObjectID(bson.ObjectID.generate())
-        const res3 = await thread.updateThreadContent(app.locals.threadCollection)
+        const res3 = await Thread.updateThreadContent(thread, app.locals.threadCollection)
         assert.isFalse(res3.status)
       } catch (e) {
       }
     })
-    it('Create a new thread and read it', async function () {
+    it('Create a new Thread and read it', async function () {
       // For Callback (Passing)
       try {
         const thread = new Thread({
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'read content'
         })
-        const res = await thread.createThread(app.locals.threadCollection)
+        const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         const res2 = await Thread.readThreadUsingId(thread._id.toHexString(), app.locals.threadCollection)
         assert.equal('read content', res2.thread.content)
@@ -54,11 +54,11 @@ describe('# Threads test-suite', function () {
         assert.isTrue(false)
       }
     })
-    it('Create a new thread and delete it', async function () {
+    it('Create a new Thread and delete it', async function () {
       // For Callback (Passing)
       try {
         const thread = new Thread({ author: new bson.ObjectID(bson.ObjectID.generate()), content: 'delete content' })
-        const res = await thread.createThread(app.locals.threadCollection)
+        const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         const res2 = await Thread.deleteThreadUsingId(thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res2.status)
@@ -69,13 +69,13 @@ describe('# Threads test-suite', function () {
         assert.isTrue(false)
       }
     })
-    it('Create a new thread and change it stars', async function () {
+    it('Create a new Thread and change it stars', async function () {
       try {
         const thread = new Thread({
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'stars content'
         })
-        const res = await thread.createThread(app.locals.threadCollection)
+        const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         const res2 = await Thread.updateStars(thread._id.toHexString(), 'inc', app.locals.threadCollection)
         assert.isTrue(res2.status)
@@ -100,7 +100,7 @@ describe('# Threads test-suite', function () {
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'upvote content'
         })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const user = new bson.ObjectID(bson.ObjectID.generate())
         const res2 = await Thread.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
@@ -125,7 +125,7 @@ describe('# Threads test-suite', function () {
           author: new bson.ObjectID(bson.ObjectID.generate()),
           content: 'upvote content'
         })
-        const res1 = await thread.createThread(app.locals.threadCollection)
+        const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const user = new bson.ObjectID(bson.ObjectID.generate())
         const res2 = await Thread.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)

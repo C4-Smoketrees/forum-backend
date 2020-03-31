@@ -18,7 +18,7 @@ class User {
   /**
    *
    * @param {string} userId
-   * @param {{content:string,title:string,_id?:ObjectId}} draft
+   * @param {{content:string,title:string,_id?:ObjectId,tags:string[]}} draft
    * @param {Collection} userCollection
    * @returns {Promise<void>}
    */
@@ -50,7 +50,13 @@ class User {
         _id: ObjectId.createFromHexString(userId),
         drafts: { $elemMatch: { _id: draft._id } }
       }
-      const query = { $set: { 'drafts.$.content': draft.content, 'drafts.$.title': draft.title } }
+      const query = {
+        $set: {
+          'drafts.$.content': draft.content,
+          'drafts.$.title': draft.title,
+          'drafts:$.tags': draft.tags
+        }
+      }
       const res = await userCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
         response = { status: true, draftId: draft._id }
@@ -121,7 +127,7 @@ class User {
       author: this._id
     })
     let response
-    const res = await thread.createThread(threadCollection)
+    const res = await Thread.createThread(thread, threadCollection)
     if (!res.status) {
       if (res.err) {
         response = { status: false, msg: 'error occurred', err: res.err }
@@ -224,7 +230,7 @@ class User {
    * @returns {Promise<{status: boolean}>}
    */
   async addReply (reply, threadId, userCollection, threadCollection) {
-    const res1 = await reply.createReply(threadId, threadCollection)
+    const res1 = await Reply.createReply(reply, threadId, threadCollection)
     if (!res1.status) {
       return { status: false }
     }

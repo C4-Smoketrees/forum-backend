@@ -38,35 +38,36 @@ class Thread {
     this.author = thread.author
     this.stars = thread.stars
     this.lastUpdate = thread.lastUpdate
+    this.tags = thread.tags
   }
 
   /**
    * Creates a new thread in database
    * @param {Collection} threadCollection
+   * @param {Thread} thread
    * @returns {Promise} returns a promise
    */
-  createThread (threadCollection) {
+  static createThread (thread, threadCollection) {
     const func = async () => {
       try {
-        // reference for thread is this
-        this._id = new bson.ObjectID(bson.ObjectID.generate())
-        this.replies = []
-        this.reports = []
-        this.dateTime = Date.now()
-        this.upvotes = []
-        this.downvotes = []
-        this.stars = 0
-        this.lastUpdate = Date.now()
-        await threadCollection.insertOne(this)
+        thread._id = new bson.ObjectID(bson.ObjectID.generate())
+        thread.replies = []
+        thread.reports = []
+        thread.dateTime = Date.now()
+        thread.upvotes = []
+        thread.downvotes = []
+        thread.stars = 0
+        thread.lastUpdate = Date.now()
+        await threadCollection.insertOne(thread)
         const response = {
           status: true,
-          id: this._id.toHexString()
+          id: thread._id.toHexString()
         }
         logger.debug(`Insert new thread with id:${response.id}`)
         return response
       } catch (e) {
         const response = { status: false, err: e }
-        logger.debug(`Insert new thread with id:${response.id}`)
+        logger.error(` err new thread with id:${response.id}`, { err: e })
         return response
       }
     }
@@ -78,9 +79,9 @@ class Thread {
    * @param {Collection} threadCollection
    * @returns {Promise} A promise that always resolves
    */
-  updateThreadContent (threadCollection) {
-    const filter = { _id: this._id }
-    const query = { $set: { content: this.content, lastUpdate: Date.now(), title: this.title } }
+  static updateThreadContent (thread, threadCollection) {
+    const filter = { _id: thread._id }
+    const query = { $set: { content: thread.content, lastUpdate: Date.now(), title: thread.title } }
 
     const func = async () => {
       try {
@@ -89,12 +90,12 @@ class Thread {
         if (res.modifiedCount === 1) {
           response = {
             status: true,
-            id: this._id.toHexString()
+            id: thread._id.toHexString()
           }
           logger.debug(`Updated content for thread for id: ${response.id}`)
         } else {
-          response = { status: false, id: this._id.toHexString() }
-          logger.error(JSON.stringify({ id: this._id.toHexString(), matches: res.matchedCount }))
+          response = { status: false, id: thread._id.toHexString() }
+          logger.error(JSON.stringify({ id: thread._id.toHexString(), matches: res.matchedCount }))
         }
         return response
       } catch (e) {

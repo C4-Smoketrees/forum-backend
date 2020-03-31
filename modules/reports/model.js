@@ -26,7 +26,7 @@ class Report {
    * @param {Collection} threadCollection
    * @return {Promise<DatabaseReportWriteResponse>}
    */
-  static createReport (threadId, report, threadCollection) {
+  static async createReport (threadId, report, threadCollection) {
     const func = async () => {
       try {
         let response
