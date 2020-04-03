@@ -9,7 +9,13 @@ router.post('/new', jwtAuth, async (req, res) => {
   }
   const draft = req.body.draft
   const response = await User.createDraft(req.userId, draft, req.app.locals.userCollection, req.app.locals.tagCollection)
-  res.status(200).json(response)
+  if (response.status) {
+    res.status(200).json(await response)
+  } else if (response.err) {
+    res.status(500).json(response)
+  } else {
+    res.status(500).json(response)
+  }
 })
 
 module.exports = router
