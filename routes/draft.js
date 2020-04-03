@@ -56,5 +56,14 @@ router.post('/publish',jwtAuth,async (req,res)=>{
     res.status(500).json(response)
   }
 });
-
+router.post('/delete',jwtAuth,async (req,res)=>{
+  const response=await User.deleteDraft(req.userid,req.query.draftId,req.app.locals.userCollection);
+  if(response.status)
+  {
+    res.status(200).json(await response)
+  }
+  else{
+    res.status(500).json(response);
+  }
+});
 module.exports = router
