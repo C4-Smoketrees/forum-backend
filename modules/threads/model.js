@@ -76,12 +76,14 @@ class Thread {
 
   /**
    * Update ThreadContent using _id property of the thread object
+   * @param thread
    * @param {Collection} threadCollection
    * @returns {Promise} A promise that always resolves
    */
   static updateThreadContent (thread, threadCollection) {
     const filter = { _id: thread._id }
-    const query = { $set: { content: thread.content, lastUpdate: Date.now(), title: thread.title } }
+    thread.lastUpdate = Date.now()
+    const query = { $set: thread }
 
     const func = async () => {
       try {

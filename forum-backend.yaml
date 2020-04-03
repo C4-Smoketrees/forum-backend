@@ -21,7 +21,6 @@ paths:
           name: 'Authorization'
           description: 'JWT token header for the user'
           example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k'
-
       requestBody:
         content:
           application/json:
@@ -59,11 +58,44 @@ paths:
                   draftId:
                     type: string
                     description: hexstring for draftId which was created
-                    example:
-
+                    example: '5e86e1b20b805a00c91f0966'
         '403':
           description: not authorized
         '501':
           description: Server error
         '400':
           description: unknown error
+  /drafts/all:
+    get:
+      summary: '/drafts/all'
+      description: >
+
+      parameters:
+        - in: header
+          name: 'Authorization'
+          description: 'JWT token header for the user'
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k'
+
+      responses:
+        200:
+
+
+components:
+  schemas:
+    Draft:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Title for the draft
+        content:
+          type: string
+          description: Content for the draft
+        _id:
+          type: string
+          description: Draft's hexstring
+          example: '5e86e1b20b805a00c91f0966'
+        tags:
+          type: array<string>
+          description: Tags for a draft
+
