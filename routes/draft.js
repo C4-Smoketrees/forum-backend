@@ -18,7 +18,7 @@ router.post('/new', jwtAuth, async (req, res) => {
   }
 });
 router.get('/all',jwtAuth,async(req,res)=>{
-  const response=User.getUser(req.userId,req.app.locals.userCollection);
+  const response=await User.getUser(req.userId,req.app.locals.userCollection);
   if(response.status){
     res.status(200).json(await response)
   }
@@ -28,6 +28,32 @@ router.get('/all',jwtAuth,async(req,res)=>{
   else
   {
     res.status(400).json(response)
+  }
+});
+router.get('/one',jwtAuth,async (req,res)=>{
+  const response=await User.readDraft(req.userId,req.query.draftId,req.app.locals.userCollection);
+  if(response.status)
+  {
+    res.status(200).json(await response)
+  }
+  else if(response.err){
+    res.status(501).json(response);
+  }
+  else
+  {
+    res.status(400).json(response);
+  }
+});
+
+router.post('/publish',jwtAuth,async (req,res)=>{
+  const response=await User.publishDraft(req.query.draftId,req.app.locals.userCollection,req.app.locals.threadCollection);
+  if(response.status)
+  {
+    res.status(200).json(await response)
+  }
+  else
+  {
+    res.status(500).json(response)
   }
 });
 
