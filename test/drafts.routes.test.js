@@ -27,4 +27,47 @@ describe('# Route test for /drafts', function () {
     assert.equal(res.status, 200)
     assert.isNotNull(res.body.draftId)
   })
+  it('POST /update', async function () {
+    let res
+    try {
+      res = await chai.request(app)
+        .post('/drafts/new')
+        .set({
+          Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
+          'Content-Type': 'application/json'
+        })
+        .send({
+          draft: {
+            content: 'route-draft-content', title: 'route-draft-title', tags: ['google', 'facebook']
+          }
+        })
+    } catch (e) {
+      console.log(e)
+      assert.isTrue(e)
+    }
+    assert.equal(res.status, 200)
+    assert.isNotNull(res.body.draftId)
+    const draftId = res.body.draftId
+    try {
+      res = await chai.request(app)
+        .post('/drafts/update')
+        .set({
+          Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
+          'Content-Type': 'application/json'
+        })
+        .send({
+          draft: {
+            content: 'route-draft-content-update',
+            title: 'route-draft-title-update',
+            tags: ['google', 'facebook', 'update'],
+            _id: draftId
+          }
+        })
+    } catch (e) {
+      console.log(e)
+      assert.isTrue(e)
+    }
+    assert.equal(res.status, 200)
+    assert.isNotNull(res.body.draftId)
+  })
 })
