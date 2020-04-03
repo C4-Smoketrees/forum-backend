@@ -63,7 +63,7 @@ router.post('/delete',jwtAuth,async (req,res)=>{
     res.status(200).json(await response)
   }
   else{
-    res.status(500).json(response);
+    res.status(500).json(response)
   }
 });
 module.exports = router
