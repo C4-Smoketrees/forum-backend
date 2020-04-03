@@ -29,6 +29,7 @@ app.use(parser.json())
 app.use(compression())
 
 // Logging
+app.use('/drafts', require('./routes/draft'))
 
 app.use(morgan)
 
