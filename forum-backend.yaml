@@ -75,12 +75,143 @@ paths:
           name: 'Authorization'
           description: 'JWT token header for the user'
           example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k'
-
+      tags:
+        - drafts
       responses:
         200:
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  drafts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Draft'
+        '403':
+          description: not authorized
+        '501':
+          description: Server error
+        '400':
+          description: unknown error
 
+  /drafts/publish:
+    post:
+      summary: /drafts/publish
+      description: >
+        Publish a draft
+      tags:
+        - drafts
+      parameters:
+        - $ref: '#/components/parameters/JWT'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  threadId:
+                    type: string
+                    description: id of the thread
+                  draftId:
+                    type: string
+                    description: id of the draft
+        '500':
+          description: Server error
+
+  /drafts/delete:
+    post:
+      description: Delete a draft
+      summary: /drafts/delete
+      tags:
+        - drafts
+      parameters:
+        - $ref: '#/components/parameters/JWT'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                draftId:
+                  type: string
+                  description: hexstring for draft
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  draftId:
+                    type: string
+                    description: hexstring for draft
+        '500':
+          $ref: '#/components/responses/SeverError'
+  /drafts/update:
+    post:
+      description: Update fields of a draft
+      summary: /drafts/update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                draft:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      required: true
+                      description: hexstring for the draft Id
+                    content:
+                      type: string
+                      required: false
+                    title:
+                      type: string
+                      required: false
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                      required: false
+      tags:
+        - drafts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                  draftId:
+                    type: string
+                    description: id for the draft that was edited
 
 components:
+  parameters:
+    JWT:
+      in: header
+      name: 'Authorization'
+      description: 'JWT token header for the user'
+      example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k'
+
+  responses:
+    'SeverError':
+      description: server error
+
   schemas:
     Draft:
       type: object
@@ -88,14 +219,21 @@ components:
         title:
           type: string
           description: Title for the draft
+          example:
+            title content
         content:
           type: string
           description: Content for the draft
+          example:
+            draft content
         _id:
           type: string
           description: Draft's hexstring
           example: '5e86e1b20b805a00c91f0966'
         tags:
-          type: array<string>
+          type: array
+          items:
+            type: string
           description: Tags for a draft
-
+          example:
+            [google,tags]
