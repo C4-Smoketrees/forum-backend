@@ -8,8 +8,8 @@ router.post('/new', jwtAuth, async (req, res) => {
     return
   }
   const draft = req.body.draft
-  const response = User.createDraft(req.userId, draft, req.app.locals.userCollection, req.app.locals.tagCollection)
-  res.status(200).json(await response)
+  const response = await User.createDraft(req.userId, draft, req.app.locals.userCollection, req.app.locals.tagCollection)
+  res.status(200).json(response)
 })
 
 module.exports = router
