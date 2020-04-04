@@ -20,15 +20,16 @@ describe('# Threads test-suite', function () {
     it('Create a new Thread and update it', async function () {
       // For Callback (Passing)
       try {
+        const author = new bson.ObjectID(bson.ObjectID.generate())
         const thread = new Thread({
-          author: new bson.ObjectID(bson.ObjectID.generate()),
+          author: author,
           title: 'test title',
           content: 'test content'
         })
         const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         thread.content = 'update content'
-        const res2 = await Thread.updateThreadContent(thread, app.locals.threadCollection)
+        const res2 = await Thread.updateThreadContent(thread, author.toHexString(), app.locals.threadCollection)
         assert.isTrue(res2.status)
         thread._id = new bson.ObjectID(bson.ObjectID.generate())
         const res3 = await Thread.updateThreadContent(thread, app.locals.threadCollection)
@@ -50,12 +51,11 @@ describe('# Threads test-suite', function () {
         await Thread.addUpvote(thread._id.toHexString(), user1.toHexString(), app.locals.threadCollection)
         await Thread.addUpvote(thread._id.toHexString(), user2.toHexString(), app.locals.threadCollection)
         const res2 = await Thread.readThreadUsingId(thread._id.toHexString(), app.locals.threadCollection, user2.toHexString())
-        console.log(res2)
+
         assert.equal('read content', res2.thread.content)
         const res3 = await Thread.readThreadUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), app.locals.threadCollection)
         assert.isFalse(res3.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -69,9 +69,8 @@ describe('# Threads test-suite', function () {
         const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         const res2 = await Thread.readAllThreads(app.locals.threadCollection)
-        console.log(res2)
+        assert.isTrue(res2.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -86,7 +85,6 @@ describe('# Threads test-suite', function () {
         const res3 = await Thread.deleteThreadUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), app.locals.threadCollection)
         assert.isFalse(res3.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -106,10 +104,9 @@ describe('# Threads test-suite', function () {
         res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         res = await Thread.readThreadByTag('twitter', app.locals.threadCollection)
-        console.log(res.threads.length)
+
         assert.isTrue(res.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -158,7 +155,6 @@ describe('# Threads test-suite', function () {
         const res5 = await Thread.addUpvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
         assert.isTrue(res5.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -183,7 +179,6 @@ describe('# Threads test-suite', function () {
         const res5 = await Thread.addDownvote(thread._id.toHexString(), user.toHexString(), app.locals.threadCollection)
         assert.isTrue(res5.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })

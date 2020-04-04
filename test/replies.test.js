@@ -78,7 +78,6 @@ describe('# Replies test-suite', function () {
           app.locals.threadCollection)
         assert.isFalse(res5.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -105,7 +104,6 @@ describe('# Replies test-suite', function () {
           app.locals.threadCollection)
         assert.isFalse(res5.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -135,7 +133,6 @@ describe('# Replies test-suite', function () {
           app.locals.threadCollection)
         assert.isFalse(res6.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -164,7 +161,6 @@ describe('# Replies test-suite', function () {
           app.locals.threadCollection)
         assert.isFalse(res6.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })

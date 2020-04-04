@@ -25,7 +25,6 @@ describe('# Reports test-suite', function () {
         const res4 = await Report.createReport(thread._id.toHexString(), report, app.locals.threadCollection)
         assert.isFalse(res4.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -50,7 +49,6 @@ describe('# Reports test-suite', function () {
         const res4 = await Report.createReplyReport(thread._id.toHexString(), reply._id.toHexString(), report, app.locals.threadCollection)
         assert.isFalse(res4.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })

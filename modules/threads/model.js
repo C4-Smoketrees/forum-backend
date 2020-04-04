@@ -65,9 +65,9 @@ class Thread {
         await threadCollection.insertOne(thread)
         const response = {
           status: true,
-          id: thread._id.toHexString()
+          threadId: thread._id.toHexString()
         }
-        logger.debug(`Insert new thread with id:${response.id}`)
+        logger.debug(`Insert new thread with id:${response.threadId}`)
         return response
       } catch (e) {
         const response = { status: false, err: e }
@@ -81,11 +81,12 @@ class Thread {
   /**
    * Update ThreadContent using _id property of the thread object
    * @param thread
+   * @param userId
    * @param {Collection} threadCollection
    * @returns {Promise} A promise that always resolves
    */
-  static updateThreadContent (thread, threadCollection) {
-    const filter = { _id: thread._id }
+  static updateThreadContent (thread, userId, threadCollection) {
+    const filter = { _id: thread._id, author: bson.ObjectID.createFromHexString(userId) }
     thread.lastUpdate = Date.now()
     const query = { $set: thread }
 
@@ -96,9 +97,9 @@ class Thread {
         if (res.modifiedCount === 1) {
           response = {
             status: true,
-            id: thread._id.toHexString()
+            threadId: thread._id.toHexString()
           }
-          logger.debug(`Updated content for thread for id: ${response.id}`)
+          logger.debug(`Updated content for thread for id: ${response.threadId}`)
         } else {
           response = { status: false, id: thread._id.toHexString() }
           logger.error(JSON.stringify({ id: thread._id.toHexString(), matches: res.matchedCount }))
@@ -106,7 +107,7 @@ class Thread {
         return response
       } catch (e) {
         const response = { status: false }
-        logger.error(`Error in updating thread for id: ${response.id}`)
+        logger.error(`Error in updating thread for id: ${thread._id}`)
         return response
       }
     }
@@ -235,7 +236,7 @@ class Thread {
         const res = await threadCollection.deleteOne(filter)
         let response
         if (res.deletedCount === 1) {
-          response = { status: true, id: id }
+          response = { status: true, threadId: id }
           logger.debug(`Deleted thread id: ${id}`)
         } else {
           response = { status: false }
@@ -289,10 +290,10 @@ class Thread {
         const result = await threadCollection.updateOne(filter, query)
         let response
         if (result.modifiedCount === 1) {
-          response = { status: true, id: id }
+          response = { status: true, threadId: id }
           logger.debug(`Incremented star for the id: ${id}`)
         } else {
-          response = { status: false, id: id }
+          response = { status: false, threadId: id }
           logger.warn(`Error in incrementing star for id: ${id} modified:${result.modifiedCount} match: ${result.matchedCount}`)
         }
         return response
@@ -318,7 +319,7 @@ class Thread {
       }
       return { status: true, threads: threads }
     } catch (e) {
-      const res = { status: false }
+      const res = { status: false, err: e }
       logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }))
       return res
     }

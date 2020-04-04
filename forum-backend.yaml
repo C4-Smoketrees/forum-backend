@@ -10,6 +10,12 @@ tags:
   - name: drafts
     description: >
       Paths to create, read, publish, delete and update the draft
+  - name: threads
+    description: >
+      Paths to read, update, delete and do other operations on draft
+  - name: users
+    description: >
+      Paths to perform operation on user
 paths:
   /drafts/new:
     post:
@@ -65,6 +71,7 @@ paths:
           description: Server error
         '400':
           description: unknown error
+
   /drafts/all:
     get:
       summary: '/drafts/all'
@@ -191,6 +198,7 @@ paths:
                     description: hexstring for draft
         '500':
           $ref: '#/components/responses/SeverError'
+
   /drafts/update:
     post:
       description: Update fields of a draft
@@ -234,6 +242,15 @@ paths:
                   draftId:
                     type: string
                     description: id for the draft that was edited
+
+  /thread/one:
+    get:
+      description: Read one thread
+      summary: /thread/one
+
+      responses:
+        '200':
+
 
 components:
   parameters:

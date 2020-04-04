@@ -17,7 +17,6 @@ const dbConn = async () => {
     app.locals.userCollection = await app.locals.db.collection('users')
     app.locals.tagCollection = await app.locals.db.collection('tags')
   } catch (e) {
-    console.log(e)
     process.exit(2)
   }
 }
@@ -30,6 +29,7 @@ app.use(compression())
 
 // Logging
 app.use('/drafts', require('./routes/draft'))
+app.use('/threads', require('./routes/thread'))
 
 app.use(morgan)
 
