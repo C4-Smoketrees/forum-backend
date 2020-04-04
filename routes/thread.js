@@ -61,7 +61,17 @@ router.post('/update', jwtAuth, async (req, res) => {
 })
 
 router.post('/star', jwtAuth, async (req, res) => {
-
+  const userId = req.userId
+  const threadId = req.body._id
+  const user = new User({ _id: bson.ObjectID.createFromHexString(userId) })
+  const response = await user.addStar(threadId, req.app.locals.userCollection, req.app.locals.threadCollection)
+  if (response.status) {
+    res.status(200).json(response)
+  } else if (response.err) {
+    res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
+  }
 })
 
 router.post('/upvote', jwtAuth, async (req, res) => {
