@@ -81,11 +81,12 @@ class Thread {
   /**
    * Update ThreadContent using _id property of the thread object
    * @param thread
+   * @param userId
    * @param {Collection} threadCollection
    * @returns {Promise} A promise that always resolves
    */
-  static updateThreadContent (thread, threadCollection) {
-    const filter = { _id: thread._id }
+  static updateThreadContent (thread, userId, threadCollection) {
+    const filter = { _id: thread._id, author: bson.ObjectID.createFromHexString(userId) }
     thread.lastUpdate = Date.now()
     const query = { $set: thread }
 

@@ -33,7 +33,7 @@ router.get('/all', jwtUnAuth, async (req, res) => {
 
 router.post('/delete', jwtAuth, async (req, res) => {
   const userId = req.userId
-  const threadId = req.body.threadId
+  const threadId = req.body._id
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) })
   const response = await user.deleteThread(threadId, req.app.locals.userCollection, req.app.locals.threadCollection)
   if (response.status) {
@@ -46,7 +46,18 @@ router.post('/delete', jwtAuth, async (req, res) => {
 })
 
 router.post('/update', jwtAuth, async (req, res) => {
-
+  const userId = req.userId
+  const thread = req.body.thread
+  const user = new User({ _id: bson.ObjectID.createFromHexString(userId) })
+  thread._id = bson.ObjectID.createFromHexString(thread._id)
+  const response = await Thread.updateThreadContent(thread, user._id.toHexString(), req.app.locals.threadCollection)
+  if (response.status) {
+    res.status(200).json(response)
+  } else if (response.err) {
+    res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
+  }
 })
 
 router.post('/star', jwtAuth, async (req, res) => {

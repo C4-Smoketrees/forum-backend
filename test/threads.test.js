@@ -20,15 +20,16 @@ describe('# Threads test-suite', function () {
     it('Create a new Thread and update it', async function () {
       // For Callback (Passing)
       try {
+        const author = new bson.ObjectID(bson.ObjectID.generate())
         const thread = new Thread({
-          author: new bson.ObjectID(bson.ObjectID.generate()),
+          author: author,
           title: 'test title',
           content: 'test content'
         })
         const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
         thread.content = 'update content'
-        const res2 = await Thread.updateThreadContent(thread, app.locals.threadCollection)
+        const res2 = await Thread.updateThreadContent(thread, author.toHexString(), app.locals.threadCollection)
         assert.isTrue(res2.status)
         thread._id = new bson.ObjectID(bson.ObjectID.generate())
         const res3 = await Thread.updateThreadContent(thread, app.locals.threadCollection)
