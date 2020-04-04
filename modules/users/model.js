@@ -45,7 +45,6 @@ class User {
       }
     } catch (e) {
       response = { status: false, err: e }
-      console.log(e)
       logger.error(`Error in creating a draft for user:${userId}`, { err: e })
     }
     return response
@@ -81,7 +80,7 @@ class User {
       }
     } catch (e) {
       response = { status: false, err: e }
-      console.log(e)
+
       logger.error(`Error in updating a draft for user:${userId}`, { err: e })
     }
     return response
@@ -134,8 +133,7 @@ class User {
 
   async publishDraft (draftId, userCollection, threadCollection) {
     const draft = (await User.readDraft(this._id.toHexString(), draftId, userCollection)).draft
-    console.log(draft)
-    console.log(draft)
+
     const thread = new Thread({
       content: draft.content,
       title: draft.title,

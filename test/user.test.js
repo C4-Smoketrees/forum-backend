@@ -30,7 +30,6 @@ describe('# User test-suite', function () {
         const res2 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection)
         assert.isTrue(res2.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -52,7 +51,6 @@ describe('# User test-suite', function () {
         const res3 = await User.updateDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection)
         assert.isTrue(res3.status)
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -71,7 +69,6 @@ describe('# User test-suite', function () {
           assert.isTrue(false)
         }
       } catch (e) {
-        console.log(e)
         assert.isTrue(false)
       }
     })
@@ -92,7 +89,7 @@ describe('# User test-suite', function () {
       assert.isTrue(res1.status)
       const user = new User({ _id: author1 })
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-      console.log(res2)
+
       assert.isTrue(res2.status)
       const res3 = await User.getUser(author1.toHexString(), app.locals.userCollection)
       assert.equal(res3.user._id.toHexString(), author1.toHexString())
@@ -104,7 +101,7 @@ describe('# User test-suite', function () {
       assert.isTrue(res1.status)
       const user = new User({ _id: author1 })
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-      console.log(res2)
+
       assert.isTrue(res2.status)
     })
     it('Delete a thread', async function () {
@@ -114,7 +111,7 @@ describe('# User test-suite', function () {
       assert.isTrue(res1.status)
       const user = new User({ _id: author1 })
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-      console.log(res2)
+
       assert.isTrue(res2.status)
       const res3 = await user.deleteThread(res2.threadId, app.locals.userCollection, app.locals.threadCollection)
       assert.isTrue(res3.status)
@@ -126,7 +123,7 @@ describe('# User test-suite', function () {
       assert.isTrue(res1.status)
       const user = new User({ _id: author1 })
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-      console.log(res2)
+
       assert.isTrue(res2.status)
       const res3 = await user.addStar(res2.threadId, app.locals.userCollection, app.locals.threadCollection)
       assert.isTrue(res3.status)
@@ -140,7 +137,7 @@ describe('# User test-suite', function () {
       assert.isTrue(res1.status)
       const user = new User({ _id: author1 })
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-      console.log(res2)
+
       assert.isTrue(res2.status)
       const res3 = await user.addStar(res2.threadId, app.locals.userCollection, app.locals.threadCollection)
       assert.isTrue(res3.status)
@@ -156,7 +153,7 @@ describe('# User test-suite', function () {
       assert.isTrue(res1.status)
       const user = new User({ _id: author1 })
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-      console.log(res2)
+
       assert.isTrue(res2.status)
       const reply = new Reply({ content: 'reply content', author: author1 })
       const res3 = await user.addReply(reply, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
@@ -171,7 +168,7 @@ describe('# User test-suite', function () {
       assert.isTrue(res1.status)
       const user = new User({ _id: author1 })
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-      console.log(res2)
+
       assert.isTrue(res2.status)
       const reply = new Reply({ content: 'reply content', author: author1 })
       const res3 = await user.addReply(reply, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
@@ -190,7 +187,7 @@ describe('# User test-suite', function () {
       const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
       assert.isTrue(res2.status)
       const res3 = await Thread.readTags(app.locals.tagCollection)
-      console.log(res3)
+
       assert.isTrue(res3.status)
     })
   })

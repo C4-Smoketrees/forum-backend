@@ -17,7 +17,6 @@ const dbConn = async () => {
     app.locals.userCollection = await app.locals.db.collection('users')
     app.locals.tagCollection = await app.locals.db.collection('tags')
   } catch (e) {
-    console.log(e)
     process.exit(2)
   }
 }

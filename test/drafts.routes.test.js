@@ -21,7 +21,6 @@ describe('# Route test for /drafts', function () {
           }
         })
     } catch (e) {
-      console.log(e)
       assert.isTrue(e)
     }
     assert.equal(res.status, 200)
@@ -42,7 +41,6 @@ describe('# Route test for /drafts', function () {
           }
         })
     } catch (e) {
-      console.log(e)
       assert.isTrue(e)
     }
     assert.equal(res.status, 200)
@@ -64,7 +62,6 @@ describe('# Route test for /drafts', function () {
           }
         })
     } catch (e) {
-      console.log(e)
       assert.isTrue(e)
     }
     assert.equal(res.status, 200)

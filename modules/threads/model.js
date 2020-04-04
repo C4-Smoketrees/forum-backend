@@ -67,7 +67,7 @@ class Thread {
           status: true,
           threadId: thread._id.toHexString()
         }
-        logger.debug(`Insert new thread with id:${response.id}`)
+        logger.debug(`Insert new thread with id:${response.threadId}`)
         return response
       } catch (e) {
         const response = { status: false, err: e }
@@ -98,7 +98,7 @@ class Thread {
             status: true,
             threadId: thread._id.toHexString()
           }
-          logger.debug(`Updated content for thread for id: ${response.id}`)
+          logger.debug(`Updated content for thread for id: ${response.threadId}`)
         } else {
           response = { status: false, id: thread._id.toHexString() }
           logger.error(JSON.stringify({ id: thread._id.toHexString(), matches: res.matchedCount }))
@@ -106,7 +106,7 @@ class Thread {
         return response
       } catch (e) {
         const response = { status: false }
-        logger.error(`Error in updating thread for id: ${response.id}`)
+        logger.error(`Error in updating thread for id: ${thread._id}`)
         return response
       }
     }
@@ -318,7 +318,7 @@ class Thread {
       }
       return { status: true, threads: threads }
     } catch (e) {
-      const res = { status: false }
+      const res = { status: false, err: e }
       logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }))
       return res
     }
