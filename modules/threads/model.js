@@ -33,6 +33,8 @@ class Thread {
     this.replies = thread.replies
     this.reports = thread.reports
     this.dateTime = thread.dateTime
+    this.upvotesCount = thread.upvotesCount
+    this.downvotesCount = thread.downvotesCount
     this.upvotes = thread.upvotes
     this.downvotes = thread.downvotes
     this.author = thread.author
@@ -56,6 +58,8 @@ class Thread {
         thread.dateTime = Date.now()
         thread.upvotes = []
         thread.downvotes = []
+        thread.upvotesCount = 0
+        thread.downvotesCount = 0
         thread.stars = 0
         thread.lastUpdate = Date.now()
         await threadCollection.insertOne(thread)
@@ -113,15 +117,47 @@ class Thread {
    * Read and return a thread using id
    * @param {string} id HexString representing id of the thread
    * @param {Collection} threadCollection
+   * @param {string} [userId]
    * @returns {Promise}  Promise always resolves
    */
-  static readThreadUsingId (id, threadCollection) {
+  static readThreadUsingId (id, threadCollection, userId) {
     const objectId = bson.ObjectID.createFromHexString(id)
     const filter = { _id: objectId }
-
+    let projection
+    if (userId) {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1,
+        upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+      }
+    } else {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1
+      }
+    }
     const func = async () => {
       try {
-        const dbRes = await threadCollection.findOne(filter)
+        const dbRes = await threadCollection.findOne(filter, { projection: projection })
         const res = { status: true, thread: await dbRes }
         logger.debug(`Read thread with id: ${res.thread._id.toHexString()}`)
         return res
@@ -134,12 +170,44 @@ class Thread {
     return func()
   }
 
-  static async readAllThreads (threadCollection) {
+  static async readAllThreads (threadCollection, userId) {
+    let projection
+    if (userId) {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1,
+        upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+      }
+    } else {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1
+      }
+    }
     try {
       let doc
       const threads = []
       let length = 0
-      const res = await threadCollection.find({})
+      const res = await threadCollection.find({}, { projection: projection })
       while (await res.hasNext()) {
         doc = await res.next()
         threads.push(doc)
@@ -258,12 +326,14 @@ class Thread {
 
   static async addUpvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
-    const query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } }
+    let query = { $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) } }
 
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
+        query = { $inc: { upvotesCount: 1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true
         }
@@ -284,12 +354,14 @@ class Thread {
 
   static async addDownvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
-    const query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } }
+    let query = { $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) } }
 
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
+        query = { $inc: { downvotesCount: 1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true
         }
@@ -310,12 +382,14 @@ class Thread {
 
   static async removeDownvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
-    const query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } }
+    let query = { $pull: { downvotes: bson.ObjectID.createFromHexString(userId) } }
 
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
+        query = { $inc: { downvotesCount: -1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true
         }
@@ -336,12 +410,14 @@ class Thread {
 
   static async removeUpvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
-    const query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } }
+    let query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } }
 
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
       if (res.modifiedCount === 1) {
+        query = { $inc: { upvotesCount: -1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true
         }

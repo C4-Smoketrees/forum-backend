@@ -39,13 +39,18 @@ describe('# Threads test-suite', function () {
     it('Create a new Thread and read it', async function () {
       // For Callback (Passing)
       try {
+        const user1 = new bson.ObjectID(bson.ObjectID.generate())
+        const user2 = new bson.ObjectID(bson.ObjectID.generate())
         const thread = new Thread({
-          author: new bson.ObjectID(bson.ObjectID.generate()),
+          author: user1,
           content: 'read content'
         })
         const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
-        const res2 = await Thread.readThreadUsingId(thread._id.toHexString(), app.locals.threadCollection)
+        await Thread.addUpvote(thread._id.toHexString(), user1.toHexString(), app.locals.threadCollection)
+        await Thread.addUpvote(thread._id.toHexString(), user2.toHexString(), app.locals.threadCollection)
+        const res2 = await Thread.readThreadUsingId(thread._id.toHexString(), app.locals.threadCollection, user2.toHexString())
+        console.log(res2)
         assert.equal('read content', res2.thread.content)
         const res3 = await Thread.readThreadUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), app.locals.threadCollection)
         assert.isFalse(res3.status)
