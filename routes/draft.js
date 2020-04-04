@@ -15,7 +15,7 @@ router.post('/new', jwtAuth, async (req, res) => {
   } else if (response.err) {
     res.status(500).json(response)
   } else {
-    res.status(500).json(response)
+    res.status(400).json(response)
   }
 })
 
@@ -54,8 +54,10 @@ router.post('/update', jwtAuth, async (req, res) => {
   const response = await User.updateDraft(req.userId, draft, req.app.locals.userCollection, req.app.locals.tagCollection)
   if (response.status) {
     res.status(200).json(response)
-  } else {
+  } else if (response.err) {
     res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
   }
 })
 
@@ -63,8 +65,10 @@ router.post('/publish', jwtAuth, async (req, res) => {
   const response = await User.publishDraft(req.query.draftId, req.app.locals.userCollection, req.app.locals.threadCollection)
   if (response.status) {
     res.status(200).json(await response)
-  } else {
+  } else if (response.err) {
     res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
   }
 })
 
@@ -72,8 +76,10 @@ router.post('/delete', jwtAuth, async (req, res) => {
   const response = await User.deleteDraft(req.userid, req.query.draftId, req.app.locals.userCollection)
   if (response.status) {
     res.status(200).json(await response)
-  } else {
+  } else if (response.err) {
     res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
   }
 })
 

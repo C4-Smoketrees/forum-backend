@@ -65,7 +65,7 @@ class Thread {
         await threadCollection.insertOne(thread)
         const response = {
           status: true,
-          id: thread._id.toHexString()
+          threadId: thread._id.toHexString()
         }
         logger.debug(`Insert new thread with id:${response.id}`)
         return response
@@ -96,7 +96,7 @@ class Thread {
         if (res.modifiedCount === 1) {
           response = {
             status: true,
-            id: thread._id.toHexString()
+            threadId: thread._id.toHexString()
           }
           logger.debug(`Updated content for thread for id: ${response.id}`)
         } else {
@@ -235,7 +235,7 @@ class Thread {
         const res = await threadCollection.deleteOne(filter)
         let response
         if (res.deletedCount === 1) {
-          response = { status: true, id: id }
+          response = { status: true, threadId: id }
           logger.debug(`Deleted thread id: ${id}`)
         } else {
           response = { status: false }
@@ -289,10 +289,10 @@ class Thread {
         const result = await threadCollection.updateOne(filter, query)
         let response
         if (result.modifiedCount === 1) {
-          response = { status: true, id: id }
+          response = { status: true, threadId: id }
           logger.debug(`Incremented star for the id: ${id}`)
         } else {
-          response = { status: false, id: id }
+          response = { status: false, threadId: id }
           logger.warn(`Error in incrementing star for id: ${id} modified:${result.modifiedCount} match: ${result.matchedCount}`)
         }
         return response

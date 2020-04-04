@@ -30,6 +30,7 @@ app.use(compression())
 
 // Logging
 app.use('/drafts', require('./routes/draft'))
+app.use('/threads', require('./routes/thread'))
 
 app.use(morgan)
 

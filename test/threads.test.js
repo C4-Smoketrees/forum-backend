@@ -50,7 +50,7 @@ describe('# Threads test-suite', function () {
         await Thread.addUpvote(thread._id.toHexString(), user1.toHexString(), app.locals.threadCollection)
         await Thread.addUpvote(thread._id.toHexString(), user2.toHexString(), app.locals.threadCollection)
         const res2 = await Thread.readThreadUsingId(thread._id.toHexString(), app.locals.threadCollection, user2.toHexString())
-        console.log(res2)
+        console.log(JSON.stringify(res2))
         assert.equal('read content', res2.thread.content)
         const res3 = await Thread.readThreadUsingId(new bson.ObjectID(bson.ObjectID.generate()).toHexString(), app.locals.threadCollection)
         assert.isFalse(res3.status)
