@@ -10,7 +10,19 @@ router.get('/one', jwtUnAuth, async (req, res) => {
   const threadId = req.query.threadId
   const response = await Thread.readThreadUsingId(threadId, req.app.locals.threadCollection, userId)
   if (response.status) {
-    res.status(200).send(200)
+    res.status(200).json(response)
+  } else if (response.err) {
+    res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
+  }
+})
+
+router.get('/all', jwtUnAuth, async (req, res) => {
+  const userId = req.userId
+  const response = await Thread.readAllThreads(req.app.locals.threadCollection, userId)
+  if (response.status) {
+    res.status(200).json(response)
   } else if (response.err) {
     res.status(500).json(response)
   } else {

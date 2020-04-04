@@ -28,4 +28,26 @@ describe('# Route test for /threads', function () {
     }
     assert.equal(res.status, 200)
   })
+
+  it('GET /all', async function () {
+    let res
+    try {
+      const author = new bson.ObjectId(bson.ObjectId.generate())
+      const response = await Thread.createThread({
+        author: author,
+        title: 'Title',
+        content: 'route thread',
+        tags: ['route', 'get', 'one', 'thread']
+      }, app.locals.threadCollection)
+      console.log(response)
+      res = await chai.request(app)
+        .get(`/threads/one?threadId=${response.threadId}`)
+        .send()
+    } catch (e) {
+      console.log(e)
+      assert.isNull(e)
+    }
+    console.log(res.body)
+    assert.equal(res.status, 200)
+  })
 })
