@@ -10,6 +10,7 @@ class Report {
     this._id = object._id
     this.userId = object.userId
     this.reportReason = object.reportReason
+    this.description = object.description
   }
 
   /**
