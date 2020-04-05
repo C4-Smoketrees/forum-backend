@@ -273,9 +273,9 @@ class User {
       }
     } catch (e) {
       logger.error(`Error in adding reply to user:${this._id.toHexString()} replyId:${replyId}`)
-      return { status: false }
+      return { status: false, replyId: res1.replyId }
     }
-    return { status: true }
+    return { status: true, replyId: res1.replyId }
   }
 
   async deleteReply (replyId, threadId, userCollection, threadCollection) {
