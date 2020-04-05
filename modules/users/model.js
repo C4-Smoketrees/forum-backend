@@ -279,7 +279,7 @@ class User {
   }
 
   async deleteReply (replyId, threadId, userCollection, threadCollection) {
-    const res1 = await Reply.deleteReply(threadId, replyId, threadCollection)
+    const res1 = await Reply.deleteReply(replyId, threadId, threadCollection)
     if (!res1.status) {
       return { status: false }
     }

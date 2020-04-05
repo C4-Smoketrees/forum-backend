@@ -31,6 +31,7 @@ app.use(compression())
 app.use('/drafts', require('./routes/draft'))
 app.use('/threads', require('./routes/thread'))
 app.use('/report', require('./routes/report'))
+app.use('/replies', require('./routes/reply'))
 
 app.use(morgan)
 

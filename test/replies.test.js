@@ -24,19 +24,21 @@ describe('# Replies test-suite', function () {
       const res1 = await Thread.createThread(thread, app.locals.threadCollection)
       assert.isTrue(res1.status)
 
-      const reply1 = new Reply({ content: 'reply 1', author: new bson.ObjectID(bson.ObjectID.generate()) })
+      const author = new bson.ObjectID(bson.ObjectID.generate())
+
+      const reply1 = new Reply({ content: 'reply 1', author: author })
       const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res2.status)
 
       const reply2 = new Reply({ content: 'reply 2', author: new bson.ObjectID(bson.ObjectID.generate()) })
       const res3 = await Reply.createReply(reply2, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res3.status)
-      reply2.content = 'update reply'
+      reply1.content = 'update reply'
 
-      const res4 = await Reply.updateReplyContent(reply2, thread._id.toHexString(), app.locals.threadCollection)
+      const res4 = await Reply.updateReplyContent(reply1, thread._id.toHexString(), author.toHexString(), app.locals.threadCollection)
       assert.isTrue(res4.status)
 
-      reply2._id = new bson.ObjectID(bson.ObjectID.generate())
+      reply1._id = new bson.ObjectID(bson.ObjectID.generate())
       const res5 = await Reply.updateReplyContent(reply2, thread._id.toHexString(), app.locals.threadCollection)
       assert.isFalse(res5.status)
     })
@@ -49,10 +51,10 @@ describe('# Replies test-suite', function () {
       const res2 = await Reply.createReply(reply1, thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res2.status)
 
-      const res3 = await Reply.deleteReply(thread._id.toHexString(), reply1._id.toHexString(), app.locals.threadCollection)
+      const res3 = await Reply.deleteReply(reply1._id.toHexString(), thread._id.toHexString(), app.locals.threadCollection)
       assert.isTrue(res3.status)
 
-      const res4 = await Reply.deleteReply(thread._id.toHexString(), reply1._id.toHexString(), app.locals.threadCollection)
+      const res4 = await Reply.deleteReply(reply1._id.toHexString(), thread._id.toHexString(), app.locals.threadCollection)
       assert.isFalse(res4.status)
     })
 
@@ -151,7 +153,7 @@ describe('# Replies test-suite', function () {
         const reply2 = new Reply({ content: 'not upvote content', author: author })
         const res3 = await Reply.createReply(reply2, thread._id.toHexString(), app.locals.threadCollection)
         assert.isTrue(res3.status)
-        const res4 = await Reply.addReplyDownvote(thread._id.toHexString(), reply1._id.toHexString(), author.toHexString()
+        const res4 = await Reply.addReplyDownvote(reply1._id.toHexString(), thread._id.toHexString(), author.toHexString()
           , app.locals.threadCollection)
         assert.isTrue(res4.status)
         const res5 = await Reply.removeReplyDownvote(reply1._id.toHexString(), thread._id.toHexString(), author.toHexString()
@@ -161,6 +163,7 @@ describe('# Replies test-suite', function () {
           app.locals.threadCollection)
         assert.isFalse(res6.status)
       } catch (e) {
+        console.log(e)
         assert.isTrue(false)
       }
     })

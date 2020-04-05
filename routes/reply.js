@@ -6,10 +6,11 @@ const User = require('../modules/users/model')
 const Reply = require('../modules/replies/model')
 const Thread = require('../modules/threads/model')
 
-router.post('thread/reply', jwtAuth, async (req, res) => {
+router.post('/', jwtAuth, async (req, res) => {
   const userId = req.userId
   const threadId = req.body.threadId
   const reply = req.body.reply
+  reply.author = bson.ObjectID.createFromHexString(userId)
   const user = new User({ _id: bson.ObjectID.createFromHexString(userId) })
   const response = await user.addReply(reply, threadId, req.app.locals.userCollection, req.app.locals.threadCollection)
   if (response.status) {
@@ -54,7 +55,7 @@ router.post('/update', jwtAuth, async (req, res) => {
 
 router.post('/upvote', jwtAuth, async (req, res) => {
   const userId = req.userId
-  const threadId = req.body._id
+  const threadId = req.body.threadId
   const replyId = req.body.replyId
   await Reply.removeReplyDownvote(replyId, threadId, userId, req.app.locals.threadCollection)
   const response = await Reply.addReplyUpvote(replyId, threadId, userId, req.app.locals.threadCollection)
@@ -69,7 +70,7 @@ router.post('/upvote', jwtAuth, async (req, res) => {
 
 router.post('/downvote', jwtAuth, async (req, res) => {
   const userId = req.userId
-  const threadId = req.body._id
+  const threadId = req.body.threadId
   const replyId = req.body.replyId
   await Reply.removeReplyUpvote(replyId, threadId, userId, req.app.locals.threadCollection)
   const response = await Reply.addReplyDownvote(replyId, threadId, userId, req.app.locals.threadCollection)
@@ -84,7 +85,7 @@ router.post('/downvote', jwtAuth, async (req, res) => {
 
 router.post('/removeUpvote', jwtAuth, async (req, res) => {
   const userId = req.userId
-  const threadId = req.body._id
+  const threadId = req.body.threadId
   const replyId = req.body.replyId
   const response = await Reply.removeReplyUpvote(replyId, threadId, userId, req.app.locals.threadCollection)
   if (response.status) {
@@ -98,7 +99,7 @@ router.post('/removeUpvote', jwtAuth, async (req, res) => {
 
 router.post('/removeDownvote', jwtAuth, async (req, res) => {
   const userId = req.userId
-  const threadId = req.body._id
+  const threadId = req.body.threadId
   const replyId = req.body.replyId
   const response = await Thread.removeDownvote(replyId, threadId, userId, req.app.locals.threadCollection)
   if (response.status) {

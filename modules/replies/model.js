@@ -56,12 +56,12 @@ class Reply {
     return response
   }
 
-  static async updateReplyContent (reply, threadId, threadCollection) {
+  static async updateReplyContent (reply, threadId, userId, threadCollection) {
     let response
     try {
       const filter = {
         _id: bson.ObjectID.createFromHexString(threadId),
-        replies: { $elemMatch: { _id: reply._id } }
+        replies: { $elemMatch: { _id: reply._id, author: bson.ObjectID.createFromHexString(userId) } }
       }
       const query = {
         $set: {
@@ -84,6 +84,7 @@ class Reply {
         logger.debug(`Updated reply for thread:${threadId} replyId:${reply._id}`)
       }
     } catch (e) {
+      console.log(e)
       response = {
         status: false,
         err: e
@@ -239,6 +240,7 @@ class Reply {
   }
 
   static async removeReplyDownvote (replyId, threadId, userId, threadCollection) {
+    console.log(threadId)
     const filter = {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
