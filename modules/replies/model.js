@@ -9,6 +9,8 @@ class Reply {
     this.upvotes = object.upvotes
     this.downvotes = object.downvotes
     this.dateTime = object.dateTime
+    this.upvotesCount = object.upvotesCount
+    this.downvotesCount = object.downvotesCount
     this.reports = object.reports
   }
 
@@ -16,6 +18,8 @@ class Reply {
     let response
     reply.upvotes = []
     reply.downvotes = []
+    reply.upvotesCount = 0
+    reply.downvotesCount = 0
     reply.reports = []
     try {
       const filter = {
@@ -128,7 +132,7 @@ class Reply {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
     }
-    const query = {
+    let query = {
       $addToSet: { 'replies.$.upvotes': bson.ObjectID.createFromHexString(userId) }
     }
     let response
@@ -141,6 +145,8 @@ class Reply {
         }
         logger.debug(response.msg)
       } else {
+        query = { $inc: { 'replies.$.upvotesCount': 1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
@@ -163,7 +169,7 @@ class Reply {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
     }
-    const query = {
+    let query = {
       $addToSet: { 'replies.$.downvotes': bson.ObjectID.createFromHexString(userId) }
     }
     let response
@@ -176,6 +182,8 @@ class Reply {
         }
         logger.debug(response.msg)
       } else {
+        query = { $inc: { 'replies.$.downvotesCount': 1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
@@ -198,7 +206,7 @@ class Reply {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
     }
-    const query = {
+    let query = {
       $pull: { 'replies.$.upvotes': bson.ObjectID.createFromHexString(userId) }
     }
     let response
@@ -211,6 +219,8 @@ class Reply {
         }
         logger.debug(response.msg)
       } else {
+        query = { $inc: { 'replies.$.upvotesCount': -1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
@@ -233,7 +243,7 @@ class Reply {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
     }
-    const query = {
+    let query = {
       $pull: { 'replies.$.downvotes': bson.ObjectID.createFromHexString(userId) }
     }
     let response
@@ -246,6 +256,8 @@ class Reply {
         }
         logger.debug(response.msg)
       } else {
+        query = { $inc: { 'replies.$.downvotesCount': -1 } }
+        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
