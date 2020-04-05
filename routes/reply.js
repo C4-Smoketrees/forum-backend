@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const jwtAuth = require('../middleware/jwtAuth')
-const jwtUnAuth = require('../middleware/jwtUnAuth')
 const bson = require('bson')
 const User = require('../modules/users/model')
 const Reply = require('../modules/replies/model')

@@ -40,7 +40,7 @@ describe('# Route test for /report', function () {
 
     const res3 = await user.addReply({
       content: 'reply',
-      author: author1,
+      author: author1
     }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
 
     const res = await chai.request(app)
