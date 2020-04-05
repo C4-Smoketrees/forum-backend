@@ -88,7 +88,13 @@ class Thread {
   static updateThreadContent (thread, userId, threadCollection) {
     const filter = { _id: thread._id, author: bson.ObjectID.createFromHexString(userId) }
     thread.lastUpdate = Date.now()
-    const query = { $set: thread }
+    const query = {
+      $set: {
+        title: thread.title,
+        content: thread.content,
+        tags: thread.tags
+      }
+    }
 
     const func = async () => {
       try {
@@ -179,7 +185,13 @@ class Thread {
         content: 1,
         title: 1,
         tags: 1,
-        replies: 1,
+        'replies._id': 1,
+        'replies.content': 1,
+        'replies.upvotesCount': 1,
+        'replies.downvotesCount': 1,
+        'replies.title': 1,
+        'replies.dateTime': 1,
+        'replies.author': 1,
         reports: 1,
         dateTime: 1,
         upvotesCount: 1,
@@ -195,7 +207,8 @@ class Thread {
         content: 1,
         title: 1,
         tags: 1,
-        replies: 1,
+        'replies.id': 1,
+        'replies.content': 1,
         reports: 1,
         dateTime: 1,
         upvotesCount: 1,

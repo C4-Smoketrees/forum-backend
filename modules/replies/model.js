@@ -93,7 +93,7 @@ class Reply {
     return response
   }
 
-  static async deleteReply (threadId, replyId, threadCollection) {
+  static async deleteReply (replyId, threadId, threadCollection) {
     let response
     try {
       const filter = {
@@ -127,7 +127,7 @@ class Reply {
     return response
   }
 
-  static async addReplyUpvote (threadId, replyId, userId, threadCollection) {
+  static async addReplyUpvote (replyId, threadId, userId, threadCollection) {
     const filter = {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
@@ -164,7 +164,7 @@ class Reply {
     return response
   }
 
-  static async addReplyDownvote (threadId, replyId, userId, threadCollection) {
+  static async addReplyDownvote (replyId, threadId, userId, threadCollection) {
     const filter = {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
@@ -201,7 +201,7 @@ class Reply {
     return response
   }
 
-  static async removeReplyUpvote (threadId, replyId, userId, threadCollection) {
+  static async removeReplyUpvote (replyId, threadId, userId, threadCollection) {
     const filter = {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
@@ -238,7 +238,7 @@ class Reply {
     return response
   }
 
-  static async removeReplyDownvote (threadId, replyId, userId, threadCollection) {
+  static async removeReplyDownvote (replyId, threadId, userId, threadCollection) {
     const filter = {
       _id: bson.ObjectID.createFromHexString(threadId),
       replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
