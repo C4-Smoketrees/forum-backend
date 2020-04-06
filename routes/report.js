@@ -34,7 +34,6 @@ router.post('/thread', jwtAuth, async (req, res) => {
 
 router.post('/reply', jwtAuth, async (req, res) => {
   const userId = req.userId
-  const threadId = req.query.threadId
   const replyId = req.query.replyId
 
   const report = req.body.report
@@ -50,11 +49,11 @@ router.post('/reply', jwtAuth, async (req, res) => {
     return
   }
 
-  const response = await Report.createReplyReport(threadId, replyId, {
+  const response = await Report.createReplyReport(replyId, {
     reportReason: report.reportReason,
     description: report.description,
     userId: bson.ObjectId.createFromHexString(userId)
-  }, req.app.locals.threadCollection)
+  }, req.app.locals.replyCollection)
   if (response.status) {
     res.status(200).json(response)
   } else {

@@ -81,6 +81,7 @@ class Reply {
       }
       const res = await replyCollection.updateOne(filter, { $set: reply })
       if (res.modifiedCount !== 1) {
+        console.log(filter)
         response = {
           status: false,
           msg: `Unable to update content for reply a reply for replyId:${reply._id}`
@@ -147,12 +148,44 @@ class Reply {
     return response
   }
 
-  static async readReply (replyId, replyCollection) {
+  static async readReply (replyId, replyCollection, userId) {
     try {
       const filter = {
         _id: bson.ObjectID.createFromHexString(replyId)
       }
-      const reply = await replyCollection.findOne(filter)
+      let projection
+      if (userId) {
+        projection = {
+          _id: 1,
+          content: 1,
+          title: 1,
+          tags: 1,
+          replies: 1,
+          reports: 1,
+          dateTime: 1,
+          upvotesCount: 1,
+          downvotesCount: 1,
+          stars: 1,
+          lastUpdate: 1,
+          upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+          downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+        }
+      } else {
+        projection = {
+          _id: 1,
+          content: 1,
+          title: 1,
+          tags: 1,
+          replies: 1,
+          reports: 1,
+          dateTime: 1,
+          upvotesCount: 1,
+          downvotesCount: 1,
+          stars: 1,
+          lastUpdate: 1
+        }
+      }
+      const reply = await replyCollection.findOne(filter, { projection: projection })
       if (reply) {
         return { status: true, reply: reply }
       } else {

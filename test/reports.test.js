@@ -35,19 +35,17 @@ describe('# Reports test-suite', function () {
         const res1 = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res1.status)
         const reply = new Reply({ author: new bson.ObjectID(bson.ObjectID.generate()), content: '12' })
-        const res5 = await Reply.createReply(reply, thread._id.toHexString(), app.locals.threadCollection)
+        const res5 = await Reply.createReply(reply, { threadId: thread._id.toHexString() }, app.locals.threadCollection,
+          app.locals.replyCollection)
         assert.isTrue(res5.status)
         const report = new Report({
           reportReason: 1,
           userId: new bson.ObjectId(bson.ObjectID.generate())
         })
-        const res2 = await Report.createReplyReport(thread._id.toHexString(), reply._id.toHexString(), report, app.locals.threadCollection)
+        const res2 = await Report.createReplyReport(reply._id.toHexString(), report, app.locals.replyCollection)
         assert.isTrue(res2.status)
-        const res3 = await Report.createReplyReport(thread._id.toHexString(), reply._id.toHexString(), report, app.locals.threadCollection)
+        const res3 = await Report.createReplyReport(reply._id.toHexString(), report, app.locals.replyCollection)
         assert.isFalse(res3.status)
-        thread._id = new bson.ObjectID(bson.ObjectID.generate())
-        const res4 = await Report.createReplyReport(thread._id.toHexString(), reply._id.toHexString(), report, app.locals.threadCollection)
-        assert.isFalse(res4.status)
       } catch (e) {
         assert.isTrue(false)
       }

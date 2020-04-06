@@ -41,7 +41,7 @@ describe('# Route test for /report', function () {
     const res3 = await user.addReply({
       content: 'reply',
       author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+    }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
 
     const res = await chai.request(app)
       .post(`/report/reply?threadId=${res2.threadId}&replyId=${res3.replyId}`)

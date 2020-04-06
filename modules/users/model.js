@@ -253,13 +253,14 @@ class User {
   /**
    *
    * @param {Reply} reply
-   * @param {string} threadId
+   * @param id
    * @param userCollection
    * @param threadCollection
+   * @param replyCollection
    * @returns {Promise<{status: boolean}>}
    */
-  async addReply (reply, threadId, userCollection, threadCollection) {
-    const res1 = await Reply.createReply(reply, threadId, threadCollection)
+  async addReply (reply, id, userCollection, threadCollection, replyCollection) {
+    const res1 = await Reply.createReply(reply, id, threadCollection, replyCollection)
     if (!res1.status) {
       return { status: false }
     }
@@ -278,8 +279,8 @@ class User {
     return { status: true, replyId: res1.replyId }
   }
 
-  async deleteReply (replyId, threadId, userCollection, threadCollection) {
-    const res1 = await Reply.deleteReply(replyId, threadId, threadCollection)
+  async deleteReply (replyId, id, userCollection, threadCollection, replyCollection) {
+    const res1 = await Reply.deleteReply(replyId, id, threadCollection, replyCollection)
     if (!res1.status) {
       return { status: false }
     }
@@ -291,7 +292,7 @@ class User {
         return { status: false }
       }
     } catch (e) {
-      logger.error(`Error in adding reply to user:${this._id.toHexString()} replyId:${replyId}`)
+      logger.error(`Error in deleting reply from user:${this._id.toHexString()} replyId:${replyId}`)
       return { status: false }
     }
     return { status: true }

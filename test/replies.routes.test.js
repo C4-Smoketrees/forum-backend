@@ -17,6 +17,7 @@ describe('# Route test for /replies', function () {
     const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection)
     const user = new User({ _id: author1 })
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
+    assert.isTrue(res2.status)
 
     const res = await chai.request(app)
       .post('/replies')
@@ -24,7 +25,7 @@ describe('# Route test for /replies', function () {
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
-      .send({ threadId: res2.threadId, reply: { content: 'reply' } })
+      .send({ id: { threadId: res2.threadId }, reply: { content: 'reply' } })
 
     console.log(res.body)
     assert.equal(res.status, 200)
@@ -40,7 +41,8 @@ describe('# Route test for /replies', function () {
     const res3 = await user.addReply({
       content: 'reply',
       author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+    }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
+    console.log(res3)
 
     const res = await chai.request(app)
       .post('/replies/delete')
@@ -48,31 +50,7 @@ describe('# Route test for /replies', function () {
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
       })
-      .send({ threadId: res2.threadId, replyId: res3.replyId })
-
-    console.log(res.body)
-    assert.equal(res.status, 200)
-  })
-
-  it('test for /delete', async function () {
-    const draft = { content: 'draft content', title: 'draft title', tags: ['#google', '#noob'] }
-    const token = jwt.decode('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k')
-    const author1 = bson.ObjectID.createFromHexString(token._id)
-    const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection)
-    const user = new User({ _id: author1 })
-    const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
-    const res3 = await user.addReply({
-      content: 'reply',
-      author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
-
-    const res = await chai.request(app)
-      .post('/replies/delete')
-      .set({
-        Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
-        'Content-Type': 'application/json'
-      })
-      .send({ threadId: res2.threadId, replyId: res3.replyId })
+      .send({ id: { threadId: res2.threadId }, replyId: res3.replyId })
 
     console.log(res.body)
     assert.equal(res.status, 200)
@@ -89,7 +67,7 @@ describe('# Route test for /replies', function () {
     const res3 = await user.addReply({
       content: 'reply',
       author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+    }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
 
     const res = await chai.request(app)
       .post('/replies/update')
@@ -98,14 +76,11 @@ describe('# Route test for /replies', function () {
         'Content-Type': 'application/json'
       })
       .send({
-        threadId: res2.threadId,
         reply: {
           _id: res3.replyId,
           content: 'update'
         }
       })
-
-    console.log(res.body)
     assert.equal(res.status, 200)
   })
 
@@ -120,7 +95,7 @@ describe('# Route test for /replies', function () {
     const res3 = await user.addReply({
       content: 'reply',
       author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+    }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
 
     const res = await chai.request(app)
       .post('/replies/upvote')
@@ -129,7 +104,6 @@ describe('# Route test for /replies', function () {
         'Content-Type': 'application/json'
       })
       .send({
-        threadId: res2.threadId,
         replyId: res3.replyId
       })
 
@@ -148,7 +122,7 @@ describe('# Route test for /replies', function () {
     const res3 = await user.addReply({
       content: 'reply',
       author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+    }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
 
     const res = await chai.request(app)
       .post('/replies/downvote')
@@ -157,7 +131,6 @@ describe('# Route test for /replies', function () {
         'Content-Type': 'application/json'
       })
       .send({
-        threadId: res2.threadId,
         replyId: res3.replyId
       })
 
@@ -176,9 +149,9 @@ describe('# Route test for /replies', function () {
     const res3 = await user.addReply({
       content: 'reply',
       author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+    }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
 
-    await Reply.addReplyUpvote(res3.replyId, res2.threadId, token._id, app.locals.threadCollection)
+    await Reply.addReplyUpvote(res3.replyId, token._id, app.locals.replyCollection)
 
     const res = await chai.request(app)
       .post('/replies/removeUpvote')
@@ -206,9 +179,9 @@ describe('# Route test for /replies', function () {
     const res3 = await user.addReply({
       content: 'reply',
       author: author1
-    }, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+    }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
 
-    await Reply.addReplyDownvote(res3.replyId, res2.threadId, token._id, app.locals.threadCollection)
+    await Reply.addReplyDownvote(res3.replyId, token._id, app.locals.replyCollection)
 
     const res = await chai.request(app)
       .post('/replies/upvote')

@@ -156,10 +156,11 @@ describe('# User test-suite', function () {
 
       assert.isTrue(res2.status)
       const reply = new Reply({ content: 'reply content', author: author1 })
-      const res3 = await user.addReply(reply, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+      const res3 = await user.addReply(reply, { threadId: res2.threadId },
+        app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
       assert.isTrue(res3.status)
-      const res4 = await Thread.readThreadUsingId(res2.threadId, app.locals.threadCollection)
-      assert.equal(res4.thread.replies[0].content, 'reply content')
+      const res4 = await Reply.readReply(reply._id.toHexString(), app.locals.replyCollection)
+      assert.equal(res4.reply.content, 'reply content')
     })
     it('delete a reply', async function () {
       const draft = { content: 'delete reply content', title: 'delete reply title' }
@@ -171,9 +172,11 @@ describe('# User test-suite', function () {
 
       assert.isTrue(res2.status)
       const reply = new Reply({ content: 'reply content', author: author1 })
-      const res3 = await user.addReply(reply, res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+      const res3 = await user.addReply(reply, { threadId: res2.threadId },
+        app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
       assert.isTrue(res3.status)
-      const res4 = await user.deleteReply(reply._id.toHexString(), res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+      const res4 = await user.deleteReply(reply._id.toHexString(), { threadId: res2.threadId },
+        app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
       assert.isTrue(res4.status)
       const res5 = await Thread.readThreadUsingId(res2.threadId, app.locals.threadCollection)
       assert.equal(res5.thread.replies.length, 0)
