@@ -9,34 +9,81 @@ class Reply {
     this.upvotes = object.upvotes
     this.downvotes = object.downvotes
     this.dateTime = object.dateTime
+    this.lastUpdate = object.lastUpdate
     this.upvotesCount = object.upvotesCount
     this.downvotesCount = object.downvotesCount
+    this.replies = object.replies
     this.reports = object.reports
   }
 
-  static async createReply (reply, threadId, threadCollection) {
+  static async createReply (reply, id, threadCollection, replyCollection) {
     let response
     reply.upvotes = []
     reply.downvotes = []
     reply.upvotesCount = 0
     reply.downvotesCount = 0
     reply.reports = []
+    reply.replies = []
+
+    let filter
+
     try {
-      const filter = {
-        _id: bson.ObjectID.createFromHexString(threadId)
-      }
       reply._id = new bson.ObjectID(bson.ObjectId.generate())
       reply.dateTime = Date.now()
+      reply.lastUpdate = Date.now()
       const query = {
         $push: {
-          replies: reply
+          replies: reply._id
         }
       }
-      const res = await threadCollection.updateOne(filter, query)
+      let res
+      if (id.threadId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.threadId) }
+        res = await threadCollection.updateOne(filter, query)
+      } else if (id.replyId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.replyId) }
+        res = await replyCollection.updateOne(filter, query)
+      } else {
+        return { status: false, msg: 'threadId or replyId missing' }
+      }
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to create a reply for thread:${threadId} replyId:${reply._id}`
+          msg: `Unable to create a reply for thread:${id.threadId} reply:${id.reply.threadId} replyId:${reply._id}`
+        }
+        logger.debug(response.msg)
+      } else {
+        res = await replyCollection.insertOne(reply)
+        response = {
+          status: true,
+          msg: 'success',
+          replyId: reply._id.toHexString()
+        }
+        logger.debug(`New reply for thread:${id.threadId}  reply:${id.replyId} replyId:${reply._id}`)
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`error reply for thread:${id.threadId}  reply:${id.replyId} replyId:${reply._id}`, e)
+    }
+    return response
+  }
+
+  static async updateReplyContent (reply, userId, replyCollection) {
+    let response
+    try {
+      reply.author = bson.ObjectID.createFromHexString(userId)
+      const filter = {
+        _id: reply._id,
+        author: reply.author
+      }
+      const res = await replyCollection.updateOne(filter, { $set: reply })
+      if (res.modifiedCount !== 1) {
+        response = {
+          status: false,
+          msg: `Unable to update content for reply a reply for replyId:${reply._id}`
         }
         logger.debug(response.msg)
       } else {
@@ -45,234 +92,215 @@ class Reply {
           msg: 'success',
           replyId: reply._id.toHexString()
         }
-        logger.debug(`New reply for thread:${threadId} replyId:${reply._id}`)
+        logger.debug(`Updated reply for replyId:${reply._id}`)
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       }
+      logger.error(`Unable to update reply for replyId:${reply._id}`)
     }
     return response
   }
 
-  static async updateReplyContent (reply, threadId, userId, threadCollection) {
+  static async deleteReply (replyId, id, threadCollection, replyCollection) {
     let response
+    try {
+      let filter
+      let res
+
+      const query = {
+        $pull: { replies: bson.ObjectID.createFromHexString(replyId) }
+      }
+      if (id.threadId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.threadId) }
+        res = await threadCollection.updateOne(filter, query)
+      } else if (id.replyId) {
+        filter = { _id: bson.ObjectID.createFromHexString(id.replyId) }
+        res = await replyCollection.updateOne(filter, query)
+      } else {
+        return { status: false, msg: 'threadId or replyId missing' }
+      }
+      if (res.modifiedCount !== 1) {
+        response = {
+          status: false,
+          msg: `Unable to delete reply thread:${id.threadId} reply:${id.replyId} replyId:${replyId}`
+        }
+        logger.debug(response.msg)
+      } else {
+        await replyCollection.deleteOne({ _id: bson.ObjectID.createFromHexString(replyId) })
+        response = {
+          status: true,
+          msg: 'success',
+          replyId: replyId
+        }
+        logger.debug(`deleted reply for thread:${id.threadId} reply:${id.replyId} replyId:${replyId}`)
+      }
+    } catch (e) {
+      response = {
+        status: false,
+        err: e
+      }
+      logger.error(`Unable to delete reply for thread:${id.threadId} reply:${id.replyId}`, e)
+    }
+    return response
+  }
+
+  static async readReply (replyId, replyCollection) {
     try {
       const filter = {
-        _id: bson.ObjectID.createFromHexString(threadId),
-        replies: { $elemMatch: { _id: reply._id, author: bson.ObjectID.createFromHexString(userId) } }
+        _id: bson.ObjectID.createFromHexString(replyId)
       }
-      const query = {
-        $set: {
-          'replies.$.content': reply.content
-        }
-      }
-      const res = await threadCollection.updateOne(filter, query)
-      if (res.modifiedCount !== 1) {
-        response = {
-          status: false,
-          msg: `Unable to update content for reply a reply for thread:${threadId} replyId:${reply._id}`
-        }
-        logger.debug(response.msg)
+      const reply = await replyCollection.findOne(filter)
+      if (reply) {
+        return { status: true, reply: reply }
       } else {
-        response = {
-          status: true,
-          msg: 'success',
-          replyId: reply._id.toHexString()
-        }
-        logger.debug(`Updated reply for thread:${threadId} replyId:${reply._id}`)
+        logger.debug(`no user found for user:${replyId}`)
+        return { status: false }
       }
     } catch (e) {
-      console.log(e)
-      response = {
-        status: false,
-        err: e
-      }
-      logger.error(`Unable to update reply for threadId:${threadId}`)
+      logger.debug(`error in finding user:${replyId}`, e)
+      return { status: false, err: e }
     }
-    return response
   }
 
-  static async deleteReply (replyId, threadId, threadCollection) {
-    let response
-    try {
-      const filter = {
-        _id: bson.ObjectID.createFromHexString(threadId)
-      }
-      const query = {
-        $pull: { replies: { _id: bson.ObjectID.createFromHexString(replyId) } }
-      }
-      const res = await threadCollection.updateOne(filter, query)
-      if (res.modifiedCount !== 1) {
-        response = {
-          status: false,
-          msg: `Unable to delete reply thread:${threadId} replyId:${replyId}`
-        }
-        logger.debug(response.msg)
-      } else {
-        response = {
-          status: true,
-          msg: 'success',
-          replyId: replyId
-        }
-        logger.debug(`deleted reply for thread:${threadId} replyId:${replyId}`)
-      }
-    } catch (e) {
-      response = {
-        status: false,
-        err: e
-      }
-      logger.error(`Unable to delete reply for threadId:${threadId}`)
-    }
-    return response
-  }
-
-  static async addReplyUpvote (replyId, threadId, userId, threadCollection) {
+  static async addReplyUpvote (replyId, userId, replyCollection) {
     const filter = {
-      _id: bson.ObjectID.createFromHexString(threadId),
-      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+      _id: bson.ObjectID.createFromHexString(replyId)
     }
-    let query = {
-      $addToSet: { 'replies.$.upvotes': bson.ObjectID.createFromHexString(userId) }
+    const query = {
+      $addToSet: { upvotes: bson.ObjectID.createFromHexString(userId) },
+      $inc: { upvotesCount: 1 }
     }
     let response
     try {
-      const res = await threadCollection.updateOne(filter, query)
+      const res = await replyCollection.updateOne(filter, query)
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to add upvote for reply for thread:${threadId} replyId:${replyId}`
+          msg: `Unable to add upvote for reply replyId:${replyId}`
         }
         logger.debug(response.msg)
       } else {
-        query = { $inc: { 'replies.$.upvotesCount': 1 } }
-        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
           replyId: replyId
         }
-        logger.debug(`Added upvote for reply for thread:${threadId} replyId:${replyId}`)
+        logger.debug(`Added upvote for reply for replyId:${replyId}`)
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       }
-      logger.error(`Unable add upvote for reply for threadId:${threadId}`)
+      logger.error(`Unable add upvote for reply for replyId:${replyId}`)
     }
     return response
   }
 
-  static async addReplyDownvote (replyId, threadId, userId, threadCollection) {
+  static async addReplyDownvote (replyId, userId, replyCollection) {
     const filter = {
-      _id: bson.ObjectID.createFromHexString(threadId),
-      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+      _id: bson.ObjectID.createFromHexString(replyId)
     }
-    let query = {
-      $addToSet: { 'replies.$.downvotes': bson.ObjectID.createFromHexString(userId) }
+    const query = {
+      $addToSet: { downvotes: bson.ObjectID.createFromHexString(userId) },
+      $inc: { downvotesCount: 1 }
     }
     let response
     try {
-      const res = await threadCollection.updateOne(filter, query)
+      const res = await replyCollection.updateOne(filter, query)
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to add downvote for reply for thread:${threadId} replyId:${replyId}`
+          msg: `Unable to add downvote for reply replyId:${replyId}`
         }
         logger.debug(response.msg)
       } else {
-        query = { $inc: { 'replies.$.downvotesCount': 1 } }
-        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
           replyId: replyId
         }
-        logger.debug(`Added downvote for reply for thread:${threadId} replyId:${replyId}`)
+        logger.debug(`Added downvote for reply for replyId:${replyId}`)
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       }
-      logger.error(`Unable add downvote for reply for threadId:${threadId}`)
+      logger.error(`Unable add downvote for reply for replyId:${replyId}`)
     }
     return response
   }
 
-  static async removeReplyUpvote (replyId, threadId, userId, threadCollection) {
+  static async removeReplyUpvote (replyId, userId, replyCollection) {
     const filter = {
-      _id: bson.ObjectID.createFromHexString(threadId),
-      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+      _id: bson.ObjectID.createFromHexString(replyId)
     }
-    let query = {
-      $pull: { 'replies.$.upvotes': bson.ObjectID.createFromHexString(userId) }
+    const query = {
+      $pull: { upvotes: bson.ObjectID.createFromHexString(userId) },
+      $inc: { upvotesCount: -1 }
     }
     let response
     try {
-      const res = await threadCollection.updateOne(filter, query)
+      const res = await replyCollection.updateOne(filter, query)
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to remove upvote for reply for thread:${threadId} replyId:${replyId}`
+          msg: `Unable to remove upvote for reply replyId:${replyId}`
         }
         logger.debug(response.msg)
       } else {
-        query = { $inc: { 'replies.$.upvotesCount': -1 } }
-        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
           replyId: replyId
         }
-        logger.debug(`Removed upvote for reply for thread:${threadId} replyId:${replyId}`)
+        logger.debug(`remove upvote for reply for replyId:${replyId}`)
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       }
-      logger.error(`Unable remove upvote for reply for threadId:${threadId}`)
+      logger.error(`Unable to remove upvote for reply for replyId:${replyId}`)
     }
     return response
   }
 
-  static async removeReplyDownvote (replyId, threadId, userId, threadCollection) {
-    console.log(threadId)
+  static async removeReplyDownvote (replyId, userId, replyCollection) {
     const filter = {
-      _id: bson.ObjectID.createFromHexString(threadId),
-      replies: { $elemMatch: { _id: bson.ObjectID.createFromHexString(replyId) } }
+      _id: bson.ObjectID.createFromHexString(replyId)
     }
-    let query = {
-      $pull: { 'replies.$.downvotes': bson.ObjectID.createFromHexString(userId) }
+    const query = {
+      $pull: { downvotes: bson.ObjectID.createFromHexString(userId) },
+      $inc: { downvotesCount: -1 }
     }
     let response
     try {
-      const res = await threadCollection.updateOne(filter, query)
+      const res = await replyCollection.updateOne(filter, query)
       if (res.modifiedCount !== 1) {
         response = {
           status: false,
-          msg: `Unable to remove downvote for reply for thread:${threadId} replyId:${replyId}`
+          msg: `Unable to remove downvote for reply replyId:${replyId}`
         }
         logger.debug(response.msg)
       } else {
-        query = { $inc: { 'replies.$.downvotesCount': -1 } }
-        await threadCollection.updateOne(filter, query)
         response = {
           status: true,
           msg: 'success',
           replyId: replyId
         }
-        logger.debug(`Removed downvote for reply for thread:${threadId} replyId:${replyId}`)
+        logger.debug(`remove downvote for reply for replyId:${replyId}`)
       }
     } catch (e) {
       response = {
         status: false,
         err: e
       }
-      logger.error(`Unable remove downvote for reply for threadId:${threadId}`)
+      logger.error(`Unable remove downvote for reply for replyId:${replyId}`)
     }
     return response
   }
