@@ -4,6 +4,7 @@ const User = require('../modules/users/model')
 const bson = require('bson')
 
 router.post('/new', jwtAuth, async (req, res) => {
+  console.log(req.body)
   if (!req.body.draft.content || !req.body.draft.title || !req.body.draft.tags) {
     res.status(401).json({ msg: 'Fields missing' })
     return

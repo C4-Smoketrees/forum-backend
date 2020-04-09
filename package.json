@@ -27,9 +27,11 @@
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "express-sanitizer": "^1.0.5",
+    "fetch": "^1.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
     "morgan": "^1.9.1",
+    "node-fetch": "^2.6.0",
     "nyc": "^15.0.0",
     "winston": "^3.2.1"
   },
