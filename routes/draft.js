@@ -63,7 +63,8 @@ router.post('/update', jwtAuth, async (req, res) => {
 })
 
 router.post('/publish', jwtAuth, async (req, res) => {
-  const response = await User.publishDraft(req.query.draftId, req.app.locals.userCollection, req.app.locals.threadCollection)
+  const user = new User({ _id: bson.ObjectID.createFromHexString(req.userId) })
+  const response = await user.publishDraft(req.query.draftId, req.app.locals.userCollection, req.app.locals.threadCollection)
   if (response.status) {
     res.status(200).json(await response)
   } else if (response.err) {
