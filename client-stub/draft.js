@@ -15,8 +15,7 @@ async function newDraft (content, title, tags, token) {
 }
 async function getAllDraft(token){
   const res=await fetch(url + '/drafts/all',{
-    method: 'GET',
-    body: , 
+    method: 'GET', 
     headers: {Authorization: token, 'Content-Type': 'application/json'},
     agent
   })
@@ -25,10 +24,9 @@ async function getAllDraft(token){
   return body
 }
 
-async function getOneDraft(token){
-  const res=await fetch(url + '/drafts/one',{
+async function getOneDraft(draftId,token){
+  const res=await fetch(url + '/drafts/one?draftId='+draftId,{
     method: 'GET',
-    body: ,
     headers: {Authorization: token, 'Content-Type': 'application/json'},
     agent
   })
@@ -36,11 +34,10 @@ async function getOneDraft(token){
   return body
 }
 
-async function publishDraft(token)
+async function publishDraft(draftId,token)
 {
-  const res=await fetch(url + '/drafts/publish',{
+  const res=await fetch(url + '/drafts/publish?draftId='+draftId,{
     method: 'POST',
-    body: ,
     headers: {Authorization: token, 'Content-Type': 'application/json'},
     agent
   })
@@ -49,11 +46,10 @@ async function publishDraft(token)
   return body
 }
 
-async function deleteDraft(token)
+async function deleteDraft(draftId,token)
 {
-  const res=await fetch(url + '/drafts/delete',{
+  const res=await fetch(url + '/drafts/delete?draftId='+draftId,{
     method: 'POST',
-    body: ,
     headers: {Authorization: token, 'Content-Type': 'application/json'},
     agent
   })
@@ -62,3 +58,7 @@ async function deleteDraft(token)
   return body
 }
 exports.newDraft = newDraft
+exports.getAllDraft=getAllDraft
+exports.getOneDraft=getOneDraft
+exports.publishDraft=publishDraft
+exports.deleteDraft=deleteDraft
