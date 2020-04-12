@@ -10,7 +10,7 @@ router.get('/', jwtUnAuth, async (req, res) => {
   const userId = req.userId
   const replyId = req.query.replyId
   const response = await Reply.readReply(replyId, req.app.locals.replyCollection, userId)
-  console.log(response)
+
   if (response.status) {
     res.status(200).json(response)
   } else if (response.err) {

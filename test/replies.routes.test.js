@@ -27,7 +27,6 @@ describe('# Route test for /replies', function () {
       })
       .send({ id: { threadId: res2.threadId }, reply: { content: 'reply' } })
 
-    console.log(res.body)
     assert.equal(res.status, 200)
   })
 
@@ -42,7 +41,6 @@ describe('# Route test for /replies', function () {
       content: 'reply',
       author: author1
     }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
-    console.log(res3)
 
     const res = await chai.request(app)
       .post('/replies/delete')
@@ -52,7 +50,6 @@ describe('# Route test for /replies', function () {
       })
       .send({ id: { threadId: res2.threadId }, replyId: res3.replyId })
 
-    console.log(res.body)
     assert.equal(res.status, 200)
   })
 
@@ -107,7 +104,6 @@ describe('# Route test for /replies', function () {
         replyId: res3.replyId
       })
 
-    console.log(res.body)
     assert.equal(res.status, 200)
   })
 
@@ -134,7 +130,6 @@ describe('# Route test for /replies', function () {
         replyId: res3.replyId
       })
 
-    console.log(res.body)
     assert.equal(res.status, 200)
   })
 
@@ -164,7 +159,6 @@ describe('# Route test for /replies', function () {
         replyId: res3.replyId
       })
 
-    console.log(res.body)
     assert.equal(res.status, 200)
   })
 
@@ -194,7 +188,6 @@ describe('# Route test for /replies', function () {
         replyId: res3.replyId
       })
 
-    console.log(res.body)
     assert.equal(res.status, 200)
   })
 })

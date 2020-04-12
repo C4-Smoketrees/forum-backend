@@ -19,7 +19,7 @@ describe('# Route test for /report', function () {
     const res2 = await user.publishDraft(res1.draftId, app.locals.userCollection, app.locals.threadCollection)
 
     const res = await chai.request(app)
-      .post(`/report/thread?threadId=${res2.threadId}`)
+      .post(`/reports/thread?threadId=${res2.threadId}`)
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'
@@ -44,7 +44,7 @@ describe('# Route test for /report', function () {
     }, { threadId: res2.threadId }, app.locals.userCollection, app.locals.threadCollection, app.locals.replyCollection)
 
     const res = await chai.request(app)
-      .post(`/report/reply?threadId=${res2.threadId}&replyId=${res3.replyId}`)
+      .post(`/reports/reply?threadId=${res2.threadId}&replyId=${res3.replyId}`)
       .set({
         Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
         'Content-Type': 'application/json'

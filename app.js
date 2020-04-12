@@ -31,7 +31,7 @@ app.use(compression())
 // Logging
 app.use('/drafts', require('./routes/draft'))
 app.use('/threads', require('./routes/thread'))
-app.use('/report', require('./routes/report'))
+app.use('/reports', require('./routes/report'))
 app.use('/replies', require('./routes/reply'))
 
 app.use('*', function (req, res) {

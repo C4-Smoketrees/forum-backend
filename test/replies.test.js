@@ -130,7 +130,7 @@ describe('# Replies test-suite', function () {
       assert.equal(res6.reply.downvotesCount, 1)
       const res7 = await Reply.readReply(reply2._id.toHexString(), app.locals.replyCollection, author.toHexString())
       assert.isTrue(res7.status)
-      console.log(res7.reply)
+
       assert.equal(res7.reply.downvotesCount, 1)
     })
 
@@ -162,7 +162,7 @@ describe('# Replies test-suite', function () {
       assert.equal(res6.reply.upvotesCount, 1)
       const res7 = await Reply.readReply(reply2._id.toHexString(), app.locals.replyCollection, author.toHexString())
       assert.isTrue(res7.status)
-      console.log(res7.reply)
+
       assert.equal(res7.reply.upvotesCount, 1)
       const res8 = await Reply.removeReplyUpvote(reply1._id.toHexString(), author.toHexString(), app.locals.replyCollection)
       assert.isTrue(res8.status)
