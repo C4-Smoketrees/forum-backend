@@ -153,6 +153,7 @@ class Reply {
       const filter = {
         _id: bson.ObjectID.createFromHexString(replyId)
       }
+      console.log(filter)
       let projection
       if (userId) {
         projection = {
@@ -269,11 +270,14 @@ class Reply {
   }
 
   static async removeReplyUpvote (replyId, userId, replyCollection) {
+    const user = bson.ObjectID.createFromHexString(userId)
     const filter = {
-      _id: bson.ObjectID.createFromHexString(replyId)
+      _id: bson.ObjectID.createFromHexString(replyId),
+      upvotes: user
     }
+    console.log(filter)
     const query = {
-      $pull: { upvotes: bson.ObjectID.createFromHexString(userId) },
+      $pull: { upvotes: user },
       $inc: { upvotesCount: -1 }
     }
     let response
@@ -304,11 +308,13 @@ class Reply {
   }
 
   static async removeReplyDownvote (replyId, userId, replyCollection) {
+    const user = bson.ObjectID.createFromHexString(userId)
     const filter = {
-      _id: bson.ObjectID.createFromHexString(replyId)
+      _id: bson.ObjectID.createFromHexString(replyId),
+      downvotes: user
     }
     const query = {
-      $pull: { downvotes: bson.ObjectID.createFromHexString(userId) },
+      $pull: { downvotes: user },
       $inc: { downvotesCount: -1 }
     }
     let response
