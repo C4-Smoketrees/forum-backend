@@ -197,15 +197,15 @@ class User {
   }
 
   async addStar (threadId, userCollection, threadCollection) {
-    const res = await Thread.updateStars(threadId, 'inc', threadCollection)
-    if (!res.status) {
-      return { status: false }
-    }
     try {
       const filter = { _id: this._id }
-      const update = { $push: { stars: ObjectId.createFromHexString(threadId) } }
+      const update = { $addToSet: { stars: ObjectId.createFromHexString(threadId) } }
       const res2 = await userCollection.updateOne(filter, update)
       if (res2.modifiedCount !== 1) {
+        return { status: false }
+      }
+      const res = await Thread.updateStars(threadId, 'inc', threadCollection)
+      if (!res.status) {
         return { status: false }
       }
     } catch (e) {
@@ -216,15 +216,15 @@ class User {
   }
 
   async removeStar (threadId, userCollection, threadCollection) {
-    const res = await Thread.updateStars(threadId, 'dec', threadCollection)
-    if (!res.status) {
-      return { status: false }
-    }
     try {
       const filter = { _id: this._id }
       const update = { $pull: { stars: ObjectId.createFromHexString(threadId) } }
       const res2 = await userCollection.updateOne(filter, update)
       if (res2.modifiedCount !== 1) {
+        return { status: false }
+      }
+      const res = await Thread.updateStars(threadId, 'dec', threadCollection)
+      if (!res.status) {
         return { status: false }
       }
     } catch (e) {
