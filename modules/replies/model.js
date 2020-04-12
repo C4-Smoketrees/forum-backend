@@ -81,7 +81,6 @@ class Reply {
       }
       const res = await replyCollection.updateOne(filter, { $set: reply })
       if (res.modifiedCount !== 1) {
-        console.log(filter)
         response = {
           status: false,
           msg: `Unable to update content for reply a reply for replyId:${reply._id}`
@@ -153,7 +152,7 @@ class Reply {
       const filter = {
         _id: bson.ObjectID.createFromHexString(replyId)
       }
-      console.log(filter)
+
       let projection
       if (userId) {
         projection = {
@@ -275,7 +274,7 @@ class Reply {
       _id: bson.ObjectID.createFromHexString(replyId),
       upvotes: user
     }
-    console.log(filter)
+
     const query = {
       $pull: { upvotes: user },
       $inc: { upvotesCount: -1 }

@@ -13,6 +13,7 @@ async function newDraft (content, title, tags, token) {
   const body = await res.json()
   return body
 }
+
 async function getAllDraft (token) {
   const res = await fetch(url + '/drafts/all', {
     method: 'GET',
@@ -55,8 +56,22 @@ async function deleteDraft (draftId, token) {
   const body = await res.json()
   return body
 }
+
+async function updateDraft (draftId, draft, token) {
+  const res = await fetch(url + '/drafts/update', {
+    method: 'POST',
+    headers: { Authorization: token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ draft: { _id: draftId, content: draft.content, title: draft.title, tags: draft.tags } }),
+    agent
+  })
+
+  const body = await res.json()
+  return body
+}
+
 exports.newDraft = newDraft
 exports.getAllDraft = getAllDraft
 exports.getOneDraft = getOneDraft
 exports.publishDraft = publishDraft
 exports.deleteDraft = deleteDraft
+exports.updateDraft = updateDraft

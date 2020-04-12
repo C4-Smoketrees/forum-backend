@@ -6,7 +6,6 @@ const Report = require('../modules/reports/model')
 router.post('/thread', jwtAuth, async (req, res) => {
   const userId = req.userId
   const threadId = req.query.threadId
-
   const report = req.body.report
   if (!report) {
     res.status(400).json({ status: false, msg: 'Report field missing' })
@@ -37,6 +36,7 @@ router.post('/reply', jwtAuth, async (req, res) => {
   const replyId = req.query.replyId
 
   const report = req.body.report
+
   if (!report) {
     res.status(400).json({ status: false, msg: 'Report field missing' })
     return
