@@ -1,6 +1,7 @@
 # forum-backend
 
-![Linting and Test](https://github.com/smoke-trees/forum-backend/workflows/Linting%20and%20Test/badge.svg)
+![Tests](https://github.com/smoke-trees/forum-backend/workflows/Tests/badge.svg)
+![Lint](https://github.com/smoke-trees/forum-backend/workflows/Lint/badge.svg)
 
 Run following command to before committing
 
