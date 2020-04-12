@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 module.exports = function (req, res, next) {
   const token = req.get('Authorization')
+  console.log(token + '11111111111111')
   if (!token) {
     next()
     return

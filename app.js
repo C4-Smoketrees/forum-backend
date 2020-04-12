@@ -34,6 +34,10 @@ app.use('/threads', require('./routes/thread'))
 app.use('/report', require('./routes/report'))
 app.use('/replies', require('./routes/reply'))
 
+app.use('*', function (req, res) {
+  res.status(400).json({ status: false, message: 'Resource Not found' })
+})
+
 app.use(morgan)
 
 // Define routes

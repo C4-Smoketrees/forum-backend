@@ -129,6 +129,8 @@ describe('# User test-suite', function () {
       assert.isTrue(res3.status)
       const res4 = await Thread.readThreadUsingId(res2.threadId, app.locals.threadCollection)
       assert.equal(res4.thread.stars, 1)
+      const res5 = await user.addStar(res2.threadId, app.locals.userCollection, app.locals.threadCollection)
+      assert.isFalse(res5.status)
     })
     it('un-star a thread', async function () {
       const draft = { content: 'draft content', title: 'draft title' }

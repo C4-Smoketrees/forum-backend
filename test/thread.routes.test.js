@@ -113,7 +113,7 @@ describe('# Route test for /threads', function () {
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
         })
-        .send({ _id: res2.threadId })
+        .send({ threadId: res2.threadId })
     } catch (e) {
       assert.isNull(e)
     }
@@ -136,7 +136,7 @@ describe('# Route test for /threads', function () {
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
         })
-        .send({ _id: res2.threadId })
+        .send({ threadId: res2.threadId })
     } catch (e) {
       assert.isNull(e)
     }
@@ -160,7 +160,7 @@ describe('# Route test for /threads', function () {
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
         })
-        .send({ _id: res2.threadId })
+        .send({ threadId: res2.threadId })
     } catch (e) {
       assert.isNull(e)
     }
@@ -185,7 +185,7 @@ describe('# Route test for /threads', function () {
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
         })
-        .send({ _id: res2.threadId })
+        .send({ threadId: res2.threadId })
     } catch (e) {
       assert.isNull(e)
     }
@@ -210,7 +210,7 @@ describe('# Route test for /threads', function () {
           Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
           'Content-Type': 'application/json'
         })
-        .send({ _id: res2.threadId })
+        .send({ threadId: res2.threadId })
     } catch (e) {
       assert.isNull(e)
     }
