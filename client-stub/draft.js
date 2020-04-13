@@ -17,7 +17,7 @@ async function newDraft (content, title, tags, token) {
 async function getAllDraft (token) {
   const res = await fetch(url + '/drafts/all', {
     method: 'GET',
-    headers: { Authorization: token, 'Content-Type': 'application/json' },
+    headers: { Authorization: token },
     agent
   })
 
@@ -28,7 +28,7 @@ async function getAllDraft (token) {
 async function getOneDraft (draftId, token) {
   const res = await fetch(url + '/drafts/one?draftId=' + draftId, {
     method: 'GET',
-    headers: { Authorization: token, 'Content-Type': 'application/json' },
+    headers: { Authorization: token },
     agent
   })
   const body = await res.json()
@@ -41,7 +41,6 @@ async function publishDraft (draftId, token) {
     headers: { Authorization: token, 'Content-Type': 'application/json' },
     agent
   })
-
   const body = await res.json()
   return body
 }

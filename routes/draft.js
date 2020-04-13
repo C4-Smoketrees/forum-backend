@@ -11,7 +11,7 @@ router.post('/new', jwtAuth, async (req, res) => {
   const draft = req.body.draft
   const response = await User.createDraft(req.userId, draft, req.app.locals.userCollection, req.app.locals.tagCollection)
   if (response.status) {
-    res.status(200).json(await response)
+    res.status(200).json(response)
   } else if (response.err) {
     res.status(500).json(response)
   } else {
@@ -22,7 +22,7 @@ router.post('/new', jwtAuth, async (req, res) => {
 router.get('/all', jwtAuth, async (req, res) => {
   const response = await User.getUser(req.userId, req.app.locals.userCollection)
   if (response.status) {
-    res.status(200).json(await response)
+    res.status(200).json(response)
   } else if (response.err) {
     res.status(501).json(response)
   } else {
@@ -33,7 +33,7 @@ router.get('/all', jwtAuth, async (req, res) => {
 router.get('/one', jwtAuth, async (req, res) => {
   const response = await User.readDraft(req.userId, req.query.draftId, req.app.locals.userCollection)
   if (response.status) {
-    res.status(200).json(await response)
+    res.status(200).json(response)
   } else if (response.err) {
     res.status(501).json(response)
   } else {
@@ -65,7 +65,7 @@ router.post('/publish', jwtAuth, async (req, res) => {
   const user = new User({ _id: bson.ObjectID.createFromHexString(req.userId) })
   const response = await user.publishDraft(req.query.draftId, req.app.locals.userCollection, req.app.locals.threadCollection)
   if (response.status) {
-    res.status(200).json(await response)
+    res.status(200).json(response)
   } else if (response.err) {
     res.status(500).json(response)
   } else {
@@ -74,9 +74,9 @@ router.post('/publish', jwtAuth, async (req, res) => {
 })
 
 router.post('/delete', jwtAuth, async (req, res) => {
-  const response = await User.deleteDraft(req.userid, req.query.draftId, req.app.locals.userCollection)
+  const response = await User.deleteDraft(req.userId, req.query.draftId, req.app.locals.userCollection)
   if (response.status) {
-    res.status(200).json(await response)
+    res.status(200).json(response)
   } else if (response.err) {
     res.status(500).json(response)
   } else {
