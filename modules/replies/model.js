@@ -13,7 +13,6 @@ class Reply {
     this.upvotesCount = object.upvotesCount
     this.downvotesCount = object.downvotesCount
     this.replies = object.replies
-    this.reports = object.reports
   }
 
   static async createReply (reply, id, threadCollection, replyCollection) {

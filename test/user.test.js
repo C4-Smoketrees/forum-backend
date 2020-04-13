@@ -72,6 +72,22 @@ describe('# User test-suite', function () {
         assert.isTrue(false)
       }
     })
+    it('read all draft', async function () {
+      try {
+        const draft = { content: 'draft content', title: 'draft title' }
+        const author1 = new bson.ObjectID(bson.ObjectID.generate())
+        const res1 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection)
+        assert.isTrue(res1.status)
+        draft.content = 'draft content 2'
+        draft.title = 'draft title 2'
+        const res2 = await User.createDraft(author1.toHexString(), draft, app.locals.userCollection, app.locals.tagCollection)
+        assert.isTrue(res2.status)
+        const res3 = await User.getAllDraft(author1.toHexString(), app.locals.userCollection)
+        assert.isTrue(res3.length > 0)
+      } catch (e) {
+        assert.isTrue(false)
+      }
+    })
     it('Delete a draft', async function () {
       const draft = { content: 'delete draft content', title: 'delete draft title' }
       const author1 = new bson.ObjectID(bson.ObjectID.generate())

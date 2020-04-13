@@ -1,7 +1,7 @@
 const { describe, it } = require('mocha')
 const { assert } = require('chai')
 
-const client = require('../client')
+const client = require('../forum-client')
 
 describe('#Test client /report', function () {
   it('# report thread', async function () {

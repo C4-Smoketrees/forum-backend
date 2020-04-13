@@ -27,6 +27,7 @@ class User {
     let response
     try {
       draft._id = new ObjectId(ObjectId.generate())
+      draft.dateTime = new Date()
       const filter = { _id: ObjectId.createFromHexString(userId) }
       const query = { $push: { drafts: draft } }
       const res = await userCollection.updateOne(filter, query, { upsert: true })
@@ -242,6 +243,23 @@ class User {
       if (res) {
         logger.debug(`read user: ${userId}`)
         return { status: true, user: res }
+      }
+      logger.debug(`No user found for userId:${userId}`)
+      return { status: false, err: `No user found for userId:${userId}` }
+    } catch (e) {
+      logger.debug(`Error occurred while reading user:${userId}`, { err: e })
+      return { status: false, err: e }
+    }
+  }
+
+  static async getAllDraft (userId, userCollection) {
+    try {
+      const filter = { _id: ObjectId.createFromHexString(userId) }
+      const projection = { drafts: 1 }
+      const res = await userCollection.findOne(filter, { projection: projection })
+      if (res) {
+        logger.debug(`read user: ${userId}`)
+        return { status: true, drafts: res.drafts, length: res.drafts.length }
       }
       logger.debug(`No user found for userId:${userId}`)
       return { status: false, err: `No user found for userId:${userId}` }

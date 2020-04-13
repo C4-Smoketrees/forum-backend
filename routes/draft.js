@@ -20,7 +20,7 @@ router.post('/new', jwtAuth, async (req, res) => {
 })
 
 router.get('/all', jwtAuth, async (req, res) => {
-  const response = await User.getUser(req.userId, req.app.locals.userCollection)
+  const response = await User.getAllDraft(req.userId, req.app.locals.userCollection)
   if (response.status) {
     res.status(200).json(response)
   } else if (response.err) {
