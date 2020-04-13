@@ -1,6 +1,6 @@
 const { describe, it } = require('mocha')
 const { assert } = require('chai')
-const client = require('./client')
+const client = require('../client')
 
 describe('#test client', function () {
   it('# new draft', async function () {
