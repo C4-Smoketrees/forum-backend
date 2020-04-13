@@ -22,4 +22,12 @@ describe('#test client', function () {
     assert.equal(response.draft.title, 'update')
     assert.equal(response.draft.tags[0], 'update')
   })
+  it('# publish draft', async function(){
+    const response=await client.publishDraft('stub', 'client', ['smoke'], 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k')
+    assert.isTrue(response.status)
+  })
+  it('# getOne draft', async function(){
+    const response= await client.getOneDraft('stub', 'client', ['smoke'], 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k')
+    assert.isTrue(response.status)
+  })
 })
