@@ -13,6 +13,8 @@ async function threadReport (threadId, report, token) {
   return body
 }
 
+/**
+ */
 async function replyReport (replyId, report, token) {
   const res = await fetch(`${url}/reports/reply?replyId=${replyId}`, {
     method: 'POST',
