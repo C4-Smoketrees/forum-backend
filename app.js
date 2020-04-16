@@ -4,6 +4,7 @@ const MongoClient = require('mongodb').MongoClient
 const compression = require('compression')
 const sanitizer = require('express-sanitizer')
 const parser = require('body-parser')
+const cors = require('cors')
 const morgan = require('./logging/morgan')
 
 // Connect to the database
@@ -27,6 +28,7 @@ dbConn().then(() => {})
 app.use(sanitizer())
 app.use(parser.json())
 app.use(compression())
+app.use(cors())
 
 // Logging
 app.use('/drafts', require('./routes/draft'))
