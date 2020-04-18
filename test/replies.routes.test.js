@@ -28,6 +28,14 @@ describe('# Route test for /replies', function () {
       .send({ id: { threadId: res2.threadId }, reply: { content: 'reply' } })
 
     assert.equal(res.status, 200)
+
+    const res5 = await chai.request(app)
+      .post('/replies')
+      .set({
+        Authorization: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFjaGhhcG9saWExMCIsIl9pZCI6IjVlODYxNzg0ZTg1NDY2ZmJhYmQyNTc2OCIsImlhdCI6MTU4NTg0NjI0Mn0.vJ5pQfIUX8jGSodwiKhxI9pP5HLFiko7uHUSLWeXM2k',
+        'Content-Type': 'application/json'
+      })
+      .send({ id: { threadId: res2.threadId, replyId: res.body.replyId }, reply: { content: 'reply' } })
   })
 
   it('test for /delete', async function () {

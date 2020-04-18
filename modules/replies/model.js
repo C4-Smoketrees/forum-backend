@@ -4,6 +4,7 @@ const logger = require('../../logging/logger')
 class Reply {
   constructor (object) {
     this._id = object._id
+    this.threadId = object.threadId
     this.content = object.content
     this.author = object.author
     this.upvotes = object.upvotes
@@ -18,6 +19,8 @@ class Reply {
   static async createReply (reply, id, threadCollection, replyCollection) {
     let response
     reply.upvotes = []
+    reply.replyId = id.replyId
+    reply.threadId = id.threadId
     reply.downvotes = []
     reply.upvotesCount = 0
     reply.downvotesCount = 0
@@ -36,7 +39,7 @@ class Reply {
         }
       }
       let res
-      if (id.threadId) {
+      if (id.threadId && !id.replyId) {
         filter = { _id: bson.ObjectID.createFromHexString(id.threadId) }
         res = await threadCollection.updateOne(filter, query)
       } else if (id.replyId) {
