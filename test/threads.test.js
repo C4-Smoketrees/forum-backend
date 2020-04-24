@@ -185,7 +185,6 @@ describe('# Threads test-suite', function () {
     it('Search thread', async function () {
       const res = await Thread.search('draft', Date.now(), app.locals.threadCollection)
       assert.isTrue(res.status)
-
     })
   })
 })
