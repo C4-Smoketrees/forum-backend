@@ -18,11 +18,9 @@ const dbConn = async () => {
     app.locals.replyCollection = await app.locals.db.collection('replies')
     app.locals.userCollection = await app.locals.db.collection('users')
     app.locals.tagCollection = await app.locals.db.collection('tags')
-    const threadIndexes = await app.locals.threadCollection.indexInformation()
-    if (!threadIndexes.title_text_content_text && !threadIndexes.content_text_title_text) {
-      await app.locals.threadCollection.createIndex({ content: 'text', title: 'text' })
-    }
+    await app.locals.threadCollection.createIndex({ content: 'text', title: 'text' })
   } catch (e) {
+    console.log('-------')
     console.log(e)
     process.exit(2)
   }

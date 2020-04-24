@@ -8,24 +8,8 @@ const MongoClient = require('mongodb').MongoClient
 after(async function () {
   await app.locals.dbClient.close()
 })
-before(function () {
-  const dbConnectionString = 'mongodb://localhost:27017' || process.env.DB_CONN_STRING
-  return async () => {
-    const dbPromise = await MongoClient.connect(dbConnectionString, { useUnifiedTopology: true })
-    const dbClient = await dbPromise
-    const db = await dbClient.db('forum')
-    console.log(db)
-    const threadCollection = await db.collection('threads')
-    console.log(threadCollection)
-    await db.collection('replies')
-    await db.collection('tags')
-    await threadCollection.indexInformation()
-    const threadIndexes = await threadCollection.indexInformation()
-    if (!threadIndexes.title_text_content_text && !threadIndexes.content_text_title_text) {
-      await threadCollection.createIndex({ content: 'text', title: 'text' })
-      console.log('--------index------------------')
-    }
-  }
+before(async function () {
+  require('../app')
 })
 describe('# Threads test-suite', function () {
   describe('# Crud Operations', function () {
