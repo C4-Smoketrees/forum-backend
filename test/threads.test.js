@@ -3,15 +3,28 @@ const { describe, before, it, after } = require('mocha')
 const app = require('../app')
 const Thread = require('../modules/threads/model')
 const bson = require('bson')
+const MongoClient = require('mongodb').MongoClient
 
 after(async function () {
   await app.locals.dbClient.close()
 })
-before(async function () {
-  await app.locals.dbClient
-  try {
-    (await app.locals.threadCollection).drop()
-  } catch (e) {
+before(function () {
+  const dbConnectionString = 'mongodb://localhost:27017' || process.env.DB_CONN_STRING
+  return async () => {
+    const dbPromise = await MongoClient.connect(dbConnectionString, { useUnifiedTopology: true })
+    const dbClient = await dbPromise
+    const db = await dbClient.db('forum')
+    console.log(db)
+    const threadCollection = await db.collection('threads')
+    console.log(threadCollection)
+    await db.collection('replies')
+    await db.collection('tags')
+    await threadCollection.indexInformation()
+    const threadIndexes = await threadCollection.indexInformation()
+    if (!threadIndexes.title_text_content_text && !threadIndexes.content_text_title_text) {
+      await threadCollection.createIndex({ content: 'text', title: 'text' })
+      console.log('--------index------------------')
+    }
   }
 })
 describe('# Threads test-suite', function () {
@@ -184,6 +197,7 @@ describe('# Threads test-suite', function () {
     })
     it('Search thread', async function () {
       const res = await Thread.search('draft', Date.now(), app.locals.threadCollection)
+      console.log(res)
       assert.isTrue(res.status)
     })
   })
