@@ -416,7 +416,6 @@ class Thread {
   static async removeUpvote (threadId, userId, threadCollection) {
     const filter = { _id: bson.ObjectID.createFromHexString(threadId) }
     let query = { $pull: { upvotes: bson.ObjectID.createFromHexString(userId) } }
-
     let response
     try {
       const res = await threadCollection.updateOne(filter, query)
@@ -439,6 +438,63 @@ class Thread {
       logger.error(`Error in upvoting thread: ${threadId} error:${e.message}`)
     }
     return response
+  }
+
+  static async search (query, startTime, threadCollection, userId) {
+    const filter = {
+      $text: {
+        $search: query
+      },
+      dateTime: { $lt: Number(startTime) }
+    }
+    let projection
+    if (userId) {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1,
+        upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+      }
+    } else {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        reports: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1
+      }
+    }
+    const threads = []
+    let lastDate = startTime
+    try {
+      const cursor = await threadCollection.find(filter, { projection: projection })
+        .sort({ dateTime: -1 })
+        .limit(50)
+      while (await cursor.hasNext()) {
+        const thread = await cursor.next()
+        threads.push(thread)
+        lastDate = thread.dateTime
+      }
+      return { status: true, threads: threads, lastDate: lastDate }
+    } catch (e) {
+      logger.error(e.message, { in: 'search', err: e.name })
+      return { status: false, err: e }
+    }
   }
 }
 

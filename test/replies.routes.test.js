@@ -36,6 +36,7 @@ describe('# Route test for /replies', function () {
         'Content-Type': 'application/json'
       })
       .send({ id: { threadId: res2.threadId, replyId: res.body.replyId }, reply: { content: 'reply' } })
+    assert.equal(res5.status, 200)
   })
 
   it('test for /delete', async function () {

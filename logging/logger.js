@@ -7,7 +7,10 @@ const logger = winston.createLogger({
     new winston.transports.Console({
       level: 'silly',
       handleExceptions: 'true',
-      format: winston.format.combine(winston.format.colorize(), winston.format.simple())
+      format: winston.format.combine(winston.format.timestamp(),
+        winston.format.colorize(),
+        winston.format.simple(),
+        winston.format.metadata())
     })
   ]
 })

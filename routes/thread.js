@@ -142,4 +142,21 @@ router.post('/removeDownvote', jwtAuth, async (req, res) => {
   }
 })
 
+router.get('/search', jwtUnAuth, async (req, res) => {
+  const query = req.query.q
+
+  const lastDate = req.query.ld || Date.now()
+
+  const userId = req.userId
+  const response = await Thread.search(query, lastDate, req.app.locals.threadCollection, userId)
+
+  if (response.status) {
+    res.status(200).json(response)
+  } else if (response.err) {
+    res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
+  }
+})
+
 module.exports = router
