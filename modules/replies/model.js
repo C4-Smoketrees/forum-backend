@@ -170,7 +170,8 @@ class Reply {
           stars: 1,
           lastUpdate: 1,
           upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-          downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+          downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+          authorName: 1
         }
       } else {
         projection = {
@@ -184,7 +185,8 @@ class Reply {
           upvotesCount: 1,
           downvotesCount: 1,
           stars: 1,
-          lastUpdate: 1
+          lastUpdate: 1,
+          authorName: 1
         }
       }
       const reply = await replyCollection.findOne(filter, { projection: projection })

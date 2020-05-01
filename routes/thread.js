@@ -21,7 +21,21 @@ router.get('/one', jwtUnAuth, async (req, res) => {
 
 router.get('/all', jwtUnAuth, async (req, res) => {
   const userId = req.userId
-  const response = await Thread.readAllThreads(req.app.locals.threadCollection, userId)
+  const limit = req.query.limit || 30
+  const response = await Thread.readAllThreads(limit, req.app.locals.threadCollection, userId)
+  if (response.status) {
+    res.status(200).json(response)
+  } else if (response.err) {
+    res.status(500).json(response)
+  } else {
+    res.status(400).json(response)
+  }
+})
+
+router.get('/allUnReplied', jwtUnAuth, async (req, res) => {
+  const userId = req.userId
+  const limits = req.query.limit || 30
+  const response = await Thread.readAllUnRepliedThread(limits, req.app.locals.threadCollection, userId)
   if (response.status) {
     res.status(200).json(response)
   } else if (response.err) {

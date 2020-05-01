@@ -21,12 +21,13 @@ router.get('/', jwtUnAuth, async (req, res) => {
 })
 
 router.post('/', jwtAuth, async (req, res) => {
-  const userId = req.userId
   const id = req.body.id
   const reply = req.body.reply
-  reply.author = bson.ObjectID.createFromHexString(userId)
-  const user = new User({ _id: bson.ObjectID.createFromHexString(userId) })
-  const response = await user.addReply(reply, id, req.app.locals.userCollection,
+  const user = req.user
+  reply.authorName = `${user.firstName} ${user.lastName}`
+  reply.author = bson.ObjectID.createFromHexString(req.userId)
+  const userObject = new User({ _id: bson.ObjectID.createFromHexString(req.userId) })
+  const response = await userObject.addReply(reply, id, req.app.locals.userCollection,
     req.app.locals.threadCollection, req.app.locals.replyCollection)
   if (response.status) {
     res.status(200).json(response)

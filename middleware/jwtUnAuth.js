@@ -9,6 +9,7 @@ module.exports = function (req, res, next) {
   try {
     const result = jwt.verify(token, 'testsecret')
     req.userId = result._id
+    req.user = result
     next()
   } catch (e) {
     res.status(403).send('not-authorized-mofo')

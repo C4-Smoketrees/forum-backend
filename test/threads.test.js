@@ -3,7 +3,6 @@ const { describe, before, it, after } = require('mocha')
 const app = require('../app')
 const Thread = require('../modules/threads/model')
 const bson = require('bson')
-const MongoClient = require('mongodb').MongoClient
 
 after(async function () {
   await app.locals.dbClient.close()
@@ -65,7 +64,7 @@ describe('# Threads test-suite', function () {
         })
         const res = await Thread.createThread(thread, app.locals.threadCollection)
         assert.isTrue(res.status)
-        const res2 = await Thread.readAllThreads(app.locals.threadCollection)
+        const res2 = await Thread.readAllThreads(10, app.locals.threadCollection)
         assert.isTrue(res2.status)
       } catch (e) {
         assert.isTrue(false)

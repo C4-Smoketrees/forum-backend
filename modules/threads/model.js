@@ -41,6 +41,7 @@ class Thread {
     this.stars = thread.stars
     this.lastUpdate = thread.lastUpdate
     this.tags = thread.tags
+    this.authorName = thread.authorName
   }
 
   /**
@@ -145,7 +146,8 @@ class Thread {
         stars: 1,
         lastUpdate: 1,
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        authorName: 1
       }
     } else {
       projection = {
@@ -159,7 +161,8 @@ class Thread {
         upvotesCount: 1,
         downvotesCount: 1,
         stars: 1,
-        lastUpdate: 1
+        lastUpdate: 1,
+        authorName: 1
       }
     }
     const func = async () => {
@@ -177,7 +180,7 @@ class Thread {
     return func()
   }
 
-  static async readAllThreads (threadCollection, userId) {
+  static async readAllThreads (limit, threadCollection, userId) {
     let projection
     if (userId) {
       projection = {
@@ -192,7 +195,8 @@ class Thread {
         stars: 1,
         lastUpdate: 1,
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        authorName: 1
       }
     } else {
       projection = {
@@ -205,14 +209,67 @@ class Thread {
         upvotesCount: 1,
         downvotesCount: 1,
         stars: 1,
-        lastUpdate: 1
+        lastUpdate: 1,
+        authorName: 1
       }
     }
     try {
       let doc
       const threads = []
       let length = 0
-      const res = await threadCollection.find({}, { projection: projection })
+      const res = await threadCollection.find({}, { projection: projection }).sort({ dateTime: -1 }).limit(limit)
+      while (await res.hasNext()) {
+        doc = await res.next()
+        threads.push(doc)
+        length += 1
+      }
+      return { status: true, threads: threads, length: length }
+    } catch (e) {
+      const res = { status: false }
+      logger.error(JSON.stringify({ msg: 'Error in reading all threads', err: e }))
+      return res
+    }
+  }
+
+  static async readAllUnRepliedThread (limit, threadCollection, userId) {
+    let projection
+    if (userId) {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1,
+        upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        authorName: 1
+      }
+    } else {
+      projection = {
+        _id: 1,
+        content: 1,
+        title: 1,
+        tags: 1,
+        replies: 1,
+        dateTime: 1,
+        upvotesCount: 1,
+        downvotesCount: 1,
+        stars: 1,
+        lastUpdate: 1,
+        authorName: 1
+      }
+    }
+    try {
+      let doc
+      const threads = []
+      let length = 0
+      const res = await threadCollection.find({ replies: [] }, { projection: projection })
+        .sort({ dateTime: -1 }).limit(limit)
       while (await res.hasNext()) {
         doc = await res.next()
         threads.push(doc)
@@ -462,7 +519,8 @@ class Thread {
         stars: 1,
         lastUpdate: 1,
         upvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
-        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } }
+        downvotes: { $elemMatch: { $eq: bson.ObjectID.createFromHexString(userId) } },
+        authorName: 1
       }
     } else {
       projection = {
@@ -476,7 +534,8 @@ class Thread {
         upvotesCount: 1,
         downvotesCount: 1,
         stars: 1,
-        lastUpdate: 1
+        lastUpdate: 1,
+        authorName: 1
       }
     }
     const threads = []

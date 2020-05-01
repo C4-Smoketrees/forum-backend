@@ -9,6 +9,8 @@ router.post('/new', jwtAuth, async (req, res) => {
     return
   }
   const draft = req.body.draft
+  const user = req.user
+  draft.authorName = `${user.firstName} ${user.lastName}`
   const response = await User.createDraft(req.userId, draft, req.app.locals.userCollection, req.app.locals.tagCollection)
   if (response.status) {
     res.status(200).json(response)
